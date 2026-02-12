@@ -16,7 +16,7 @@
 \geometry{margin=1in, a4paper}
 \onehalfspacing % 1.5 line spacing
 
-\addbibresource{~/Documents/Zotero/references.bib}
+\addbibresource{../references.bib}
 
 \begin{document}
 
@@ -24,9 +24,14 @@
 \begin{titlepage}
     \centering
     \vspace*{1cm}
+
+    \Large
+    \textsc{Thesis Proposal}
+
+    \vspace{0.5cm}
     
     \Huge
-    \textbf{Project Proposal Title}
+    \textbf{Quantifying efficiency gains from using evolution during automated LLM honesty red-teaming}
     
     \vspace{1.5cm}
     
@@ -37,12 +42,18 @@
     
     \vspace{2cm}
     
-    \textbf{Internal Supervisor:} Dr. Emmanuel Keuleers \\
+    \textbf{Supervisor:} Dr. Emmanuel Keuleers \\
     
     \vfill
     
     \large
     Tilburg University \\
+    School of Humanities and Digital Sciences \\
+    Department of Cognitive Science and Artificial Intelligence \\
+    
+    \vspace{2cm}
+
+    Tilburg, The Netherlands \\
     \today
     
 \end{titlepage}
@@ -51,21 +62,36 @@
 
 \section{Project Definition}
 % Task: Provide a clear description of the problem you plan to address.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Nulla porta dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Pellentesque dapibus hendrerit tortor.
+
+LLMs are given more and more autonomy in society → Creates risks → We need trust. LLMs have been shown to lie. We can't trust models that lie. While honesty benchmarks exist \parencite{renMASKBenchmarkDisentangling2026}, there is currently no reliable way to measure and compare model honesty in more realistic multi-turn conversations.
 
 \section{Motivation}
 % Task: Briefly explain why this problem is worth addressing from both societal and scientific perspectives.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Nulla porta dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Pellentesque dapibus hendrerit tortor.
+scientific
+- Can be used to compare different honesty interventions → develop better ones → use in alignment audits...
+- Can be used as a sign to model developers if something went wrong during training (Models show higher dishonesty)
+- Can give insight into why models be
+
+Societal
+- Allows us to choose honest models
+- Set an incentive for model provider to make their models more honest (what gets measured gets improved) → more honest models for society
+
 
 \section{Background}
 % Task: Summarize what is known in the scientific literature about this problem. 
 % Base this on at least 5 relevant sources (last 5 years, peer-reviewed).
+This project aims to investigate deceptive behavior in LLMs. Specifically, we aim to measure and compare their propensity to commit lies of commission in multi-turn conversations.
+
+
+\textcite{renMASKBenchmarkDisentangling2026}
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Nulla porta dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Pellentesque dapibus hendrerit tortor. \parencite{lorem_source1, lorem_source2, lorem_source3, lorem_source4, lorem_source5}
 
 \section{Design Experiment or Dataset Description}
 % Task: Describe the design of your experiment or the dataset(s) you will use in as much detail as possible (size, format, accessibility). 
 % Provide a rationale for choosing these data.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Nulla porta dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Pellentesque dapibus hendrerit tortor.
+1. Have LLMs adversarially generate multi-turn situations that induce lying on diverse models (based on MASK + PETRI + AutoDAN?)
+2. Use GLM 4.7 flash
+
 
 \section{Instrumentation and Material}
 % Task: For experimental studies, describe the instruments and materials you plan to use.

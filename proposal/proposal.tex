@@ -10,7 +10,7 @@
 \usepackage{float}
 \usepackage{enumitem}
 \usepackage{setspace}
-\usepackage[backend=biber, style=apa]{biblatex}
+\usepackage[style=apa, backend=biber, eprint=false]{biblatex}
 
 % Formatting Requirements
 \geometry{margin=1in, a4paper}
@@ -31,7 +31,7 @@
     \vspace{0.5cm}
     
     \Huge
-    \textbf{Quantifying efficiency gains from using evolution during automated LLM honesty red-teaming}
+    \textbf{Evolving Deception: Efficacy of Evolutionary Algorithms in Automated Red-Teaming for Instrumental Deception}
     
     \vspace{1.5cm}
     
@@ -63,16 +63,41 @@
 \section{Project Definition}
 % Task: Provide a clear description of the problem you plan to address.
 
-LLMs are given more and more autonomy in society → Creates risks → We need trust. LLMs have been shown to lie. We can't trust models that lie. While honesty benchmarks exist \parencite{renMASKBenchmarkDisentangling2026}, there is currently no reliable way to measure and compare model honesty in more realistic multi-turn conversations.
+As LLMs are put into increasingly critical positions in society, we need scalable methods to track whether and in which situations they lie to us.
+To address this gap, this thesis will explore the possibility of using LLM-based prompt-evolution to autonomously search for scenarios in which a specific LLM tries to deceive the user.
+Specifically, we are going to address the research question: 
+
+\begin{quote}
+    \itshape To what extent does evolutionary optimization outperform zero-shot generation in discovering realistic scenarios that induce instrumental deception in safety-aligned LLMs?
+\end{quote}
+
+By comparing how success-rate, scenario realism, and scenario diversity change when introducing evolution, we are trying to get an accurate picture whether evolution is a valuable addition for this problem.
 
 \section{Motivation}
 % Task: Briefly explain why this problem is worth addressing from both societal and scientific perspectives.
+
+
+The last years have shown a large increase in LLM usage (source). 
+When deploying those systems in more high-stakes situations, it is essential that we can trust them.
+
+LLMs have been shown to lie. 
+→ We can't trust models that lie. 
+To address lying, we need to be able to reliable find situations which cause LLMs to lie. 
+Currently often done by humans → not scalable, bottlenecked by time.
+
+
+LLMs are given more and more autonomy in society → Creates risks → We need trust. LLMs have been shown to lie. We can't trust models that lie. While honesty benchmarks exist \parencite{renMASKBenchmarkDisentangling2026}, there is currently no reliable way to measure and compare model honesty in more realistic multi-turn conversations.
+- To solve deception, we need to be able to find situations in which models deceive.
+
+
 scientific
 - Can be used to compare different honesty interventions → develop better ones → use in alignment audits...
 - Can be used as a sign to model developers if something went wrong during training (Models show higher dishonesty)
-- Can give insight into why models be
+- Can be used as adversary for training honesty increasing interventions
+- Can be used as 
 
 Societal
+- Many people use LLMs → risks + need trust → auditing is important, but often low quality or bottlenecked by human time. If evolution turns out to be great, it could replace it.
 - Allows us to choose honest models
 - Set an incentive for model provider to make their models more honest (what gets measured gets improved) → more honest models for society
 
@@ -121,6 +146,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ult
 \end{table}
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci.
+
+\section*{Acknowledgements}
+Claude Opus 4.6 \parencite{anthropicClaudeOpus462026} was used for language rephrasing; all content was human-reviewed and edited for accuracy.
 
 \newpage
 \printbibliography

@@ -81,9 +81,9 @@ Researching efficient ways to audit LLMs for deceptive behaviors is becoming inc
 Societally, there is a critical need for users to know how much they can trust the systems they are using.
 Without proper auditing, it is possible that we are not aware of deceptive tendencies in models and start using such a model in contexts where failure comes with large costs.
 Currently, such audits often require a high involvement of human experts and are thus bottlenecked by their time.
-Testing whether evolutionary methods icrease efficacy of those audits could uncover a way to decrease the amount of human intervention necessary for each alignment audit.
-Thiss productivity enhancement could them be invested into doing more or creating better alignment audits.
-Users would gain more access to auditing scores, and could used them to choose the best model, decreasing risks, and, at the same time, incentivizing model providers to invest more heavily in improving the honesty of their models.
+Testing whether evolutionary methods increase efficacy of those audits could uncover a way to decrease the amount of human intervention necessary for each alignment audit.
+This productivity enhancement could then be invested into doing more or creating better alignment audits.
+Users would gain more access to auditing scores, and could use them to choose the best model, decreasing risks, and, at the same time, incentivizing model providers to invest more heavily in improving the honesty of their models.
 
 Scientifically, this research validates evolutionary algorithms as a superior method for red-teaming.
 It moves beyond static benchmarks to dynamic, adversarial testing of honesty.
@@ -97,27 +97,75 @@ Finally, the discovered scenarios constitute high-quality data for adversarial t
 \section{Background}
 % Task: Summarize what is known in the scientific literature about this problem. 
 % Base this on at least 5 relevant sources (last 5 years, peer-reviewed).
-This project aims to investigate deceptive behavior in LLMs. Specifically, we aim to measure and compare their propensity to commit lies of commission in multi-turn conversations.
 
+This project investigates instrumental deception in Large Language Models (LLMs).
+Instrumental deception is defined as goal-based, strategic deception where the model deliberately outputs false statements to influence another agent.
+This distinguishes it from hallucinations, where the model lacks the correct internal representation, and from sycophancy, which is reactive rather than proactive.
+Recent research has identified "alignment faking," where models strategically comply with training objectives to prevent modification of their behavior \parencite{greenblattAlignmentFakingLarge2024}.
+Existing honesty benchmarks, such as the MASK benchmark, attempt to measure this behavior \parencite{renMASKBenchmarkDisentangling2026}.
+However, these benchmarks primarily rely on static, hand-designed, or one-shot scenarios.
+They fail to capture the emergent and dynamic nature of deception in realistic multi-turn conversations.
 
-\textcite{renMASKBenchmarkDisentangling2026}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Nulla porta dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Pellentesque dapibus hendrerit tortor. \parencite{lorem_source1, lorem_source2, lorem_source3, lorem_source4, lorem_source5}
+To rigorously evaluate these risks, the field is moving towards automated red-teaming.
+Manual red-teaming by humans is expensive and bottlenecked by time \parencite{hongCuriositydrivenRedteamingLarge2023}.
+Automated approaches allow for scalable auditing of model behaviors.
+Techniques such as AutoDAN-Turbo employ evolutionary algorithms to automatically generate adversarial prompts \parencite{liuAutoDANTurboLifelongAgent2025}.
+Similarly, curiosity-driven exploration has been proposed to increase the coverage of red-teaming test cases \parencite{hongCuriositydrivenRedteamingLarge2023}.
+However, these methods predominantly optimize for generic "unsafe outputs" or toxicity.
+They do not specifically target instrumental deception.
+This thesis addresses this gap by applying evolutionary optimization to discover realistic scenarios that induce instrumental deception.
 
 \section{Design Experiment or Dataset Description}
 % Task: Describe the design of your experiment or the dataset(s) you will use in as much detail as possible (size, format, accessibility). 
 % Provide a rationale for choosing these data.
-1. Have LLMs adversarially generate multi-turn situations that induce lying on diverse models (based on MASK + PETRI + AutoDAN?)
-2. Use GLM 4.7 flash
+
+This study employs a comparative experimental design to evaluate the efficacy of evolutionary algorithms.
+We compare a zero-shot baseline against an evolutionary optimization approach.
+The objective is to generate realistic multi-turn scenarios that induce instrumental deception in safety-aligned LLMs.
+For the zero-shot baseline, we prompt a generator LLM to produce deceptive scenarios directly.
+We generate a large pool of candidates and select the top 100 based on our metrics.
+For the evolutionary approach, we implement a population-based search initialized with zero-shot outputs.
+The generator LLM functions as the mutation operator.
+In each iteration, we sample parent scenarios proportional to their fitness.
+The generator creates offspring by mutating these parents to strictly improve their quality.
+We define fitness as a composite metric of three components.
+First, Deception Success measures if the target model commits a lie of commission.
+Second, Realism assesses whether the scenario mimics plausible real-world interactions.
+Third, Diversity ensures the generated scenarios cover distinct topics and strategies.
+We use GLM-4-Flash as the generator model due to its high efficiency and reasoning capability.
+We evaluate the generated scenarios against a diverse set of state-of-the-art safety-aligned LLMs.
+The final dataset consists of the top 100 scenarios from both the baseline and the evolutionary method.
 
 
 \section{Instrumentation and Material}
 % Task: For experimental studies, describe the instruments and materials you plan to use.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Nulla porta dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Pellentesque dapibus hendrerit tortor.
+
+We implement the experimental framework using Python 3.12.
+We utilize standard machine learning libraries, including PyTorch and Hugging Face Transformers.
+For efficient model inference, we employ vLLM or similar optimized inference engines.
+The core of our evolutionary engine relies on the GLM-4-Flash model, accessed via API or local weights.
+This model serves as both the scenario generator and the mutation operator.
+Our target models consist of a diverse set of open-weights safety-aligned LLMs, such as Llama-3, Mistral, and Gemma.
+These models represent the current state-of-the-art in safety fine-tuning.
+All experiments are conducted on high-performance computing resources equipped with NVIDIA A100 or H100 GPUs to ensure sufficient throughput.
+Data management and versioning are handled using Git and standard data serialization formats like JSONL.
 
 \section{Statistics, Algorithms, and Software}
 % Task: Describe the statistical analyses or data mining and machine learning algorithms and software you plan to use. 
 % Explain evaluation metrics, baseline methods, and ground-truth labeling plans.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Nulla porta dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Pellentesque dapibus hendrerit tortor.
+
+We employ three primary metrics to evaluate the generated scenarios: Deception Success Rate, Realism, and Diversity.
+Deception Success Rate is a binary metric indicating whether the target model outputs a lie of commission.
+This is determined by an automated LLM judge that compares the model's output to the ground truth.
+Realism is evaluated on a Likert scale (1-5) by a separate LLM judge, assessing the plausibility of the scenario.
+Diversity is quantified using the average cosine distance between the embeddings of the generated scenarios.
+We use a pre-trained sentence transformer model to compute these embeddings.
+To answer the research question, we compare the final populations of the zero-shot baseline and the evolutionary method.
+We use independent t-tests for continuous metrics like Realism and Diversity.
+We use Chi-square tests to compare the categorical Deception Success Rates.
+Additionally, we perform a longitudinal analysis by plotting these metrics over evolutionary generations.
+This visualizes the optimization trajectory and convergence behavior.
+All statistical analyses are performed using Python libraries such as SciPy and Scikit-learn.
 
 \section{Milestones and Plan}
 % Task: Outline the major intermediate milestones and provide a general idea of your planning.
@@ -128,16 +176,22 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ult
         \toprule
         \textbf{Milestone} & \textbf{Timeline} \\
         \midrule
-        Data Collection & Week 1-2 \\
-        Preprocessing & Week 3 \\
-        Model Development & Week 4-6 \\
-        Evaluation & Week 7 \\
-        Final Report & Week 8 \\
+        Literature Review \& Framework Design & Week 1-2 \\
+        Implementation of Zero-Shot Baseline & Week 3 \\
+        Development of Evolutionary Pipeline & Week 4-5 \\
+        Large-Scale Scenario Generation & Week 6 \\
+        Quantitative Evaluation \& Analysis & Week 7 \\
+        Thesis Writing \& Finalization & Week 8 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci.
+The project begins with a comprehensive review of existing red-teaming methods and the finalization of the evolutionary framework design.
+Following this, the zero-shot baseline will be implemented to establish a performance benchmark.
+The core development phase focuses on the evolutionary pipeline, including the mutation operators and fitness functions.
+Once the system is robust, we will execute the large-scale scenario generation across all target models.
+The subsequent phase involves a rigorous quantitative evaluation of the generated scenarios using the defined metrics.
+Finally, the results will be synthesized into the final thesis report.
 
 \section*{Acknowledgements}
 Claude Opus 4.6 \parencite{anthropicClaudeOpus462026} was used for language rephrasing; all content was human-reviewed and edited for accuracy.

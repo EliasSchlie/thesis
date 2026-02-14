@@ -63,7 +63,7 @@
 \section{Project Definition}
 % Task: Provide a clear description of the problem you plan to address.
 
-As LLMs are put into increasingly critical positions in society, we need scalable methods to track whether and in which situations they lie to us.
+As large language models (LLMs) are put into increasingly critical positions in society, we need scalable methods to track whether and in which situations they lie to us.
 To address this gap, this thesis will explore the possibility of using LLM-based prompt-evolution to autonomously search for scenarios in which a specific LLM tries to deceive the user.
 Specifically, we are going to address the research question: 
 
@@ -76,30 +76,22 @@ By comparing how success-rate, scenario realism, and scenario diversity change w
 \section{Motivation}
 % Task: Briefly explain why this problem is worth addressing from both societal and scientific perspectives.
 
+Researching efficient ways to audit LLMs for deceptive behaviors is becoming increasingly relevant from both a societal and scientific perspective.
 
-The last years have shown a large increase in LLM usage (source). 
-When deploying those systems in more high-stakes situations, it is essential that we can trust them.
+Societally, there is a critical need for users to know how much they can trust the systems they are using.
+Without proper auditing, it is possible that we are not aware of deceptive tendencies in models and start using such a model in contexts where failure comes with large costs.
+Currently, such audits often require a high involvement of human experts and are thus bottlenecked by their time.
+Testing whether evolutionary methods icrease efficacy of those audits could uncover a way to decrease the amount of human intervention necessary for each alignment audit.
+Thiss productivity enhancement could them be invested into doing more or creating better alignment audits.
+Users would gain more access to auditing scores, and could used them to choose the best model, decreasing risks, and, at the same time, incentivizing model providers to invest more heavily in improving the honesty of their models.
 
-LLMs have been shown to lie. 
-→ We can't trust models that lie. 
-To address lying, we need to be able to reliable find situations which cause LLMs to lie. 
-Currently often done by humans → not scalable, bottlenecked by time.
-
-
-LLMs are given more and more autonomy in society → Creates risks → We need trust. LLMs have been shown to lie. We can't trust models that lie. While honesty benchmarks exist \parencite{renMASKBenchmarkDisentangling2026}, there is currently no reliable way to measure and compare model honesty in more realistic multi-turn conversations.
-- To solve deception, we need to be able to find situations in which models deceive.
-
-
-scientific
-- Can be used to compare different honesty interventions → develop better ones → use in alignment audits...
-- Can be used as a sign to model developers if something went wrong during training (Models show higher dishonesty)
-- Can be used as adversary for training honesty increasing interventions
-- Can be used as 
-
-Societal
-- Many people use LLMs → risks + need trust → auditing is important, but often low quality or bottlenecked by human time. If evolution turns out to be great, it could replace it.
-- Allows us to choose honest models
-- Set an incentive for model provider to make their models more honest (what gets measured gets improved) → more honest models for society
+Scientifically, this research validates evolutionary algorithms as a superior method for red-teaming.
+It moves beyond static benchmarks to dynamic, adversarial testing of honesty.
+The evolved scenarios provide a rigorous testbed for comparing alignment interventions.
+This allows researchers to distinguish between robust honesty and superficial safety filters.
+Furthermore, high deception rates in evolved scenarios serve as a diagnostic for training failures.
+They reveal specific contexts where reinforcement learning induces reward-hacking.
+Finally, the discovered scenarios constitute high-quality data for adversarial training of honesty increasing interventions.
 
 
 \section{Background}

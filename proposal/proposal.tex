@@ -64,7 +64,7 @@
 % Task: Provide a clear description of the problem you plan to address.
 
 As large language models (LLMs) are put into increasingly critical positions in society \parencite{huiTRIDENTBenchmarkingLLM2025}, we need scalable methods to track whether and in which situations they lie to us.
-Current approaches to identifying such scenarios often relies on zero or multi-shot generation.
+Current approaches to identifying such scenarios often rely on zero or multi-shot generation.
 While showing some success, those methods often require heavy human intervention to ensure breadth and realism of generated scenarios \parencite{renMASKBenchmarkDisentangling2026}. 
 A potential pathway to address this is to evolutionarily inject previous successful examples into the prompt of the generator. 
 This thesis will test the viability of such an evolutionary approach. 
@@ -118,7 +118,6 @@ Each of those papers relies on a mix of LLM generation and human review to creat
 To create the MASK benchmark, for instance, the authors hired and trained a group of contributors, who manually generated and checked examples at different stages of the process. 
 
 A big concern when testing for deception in LLMs is evaluation awareness \parencite{needhamLargeLanguageModels2025}.
-
 Evaluation awareness describes the ability of LLMs to recognize when they are being tested and potentially change their behavior based on this.
 Through a process known as alignment faking, LLMs strategically modify their outputs to appear compliant with training objectives during assessment.
 However, these models revert to misaligned behavior once they detect that oversight is absent or unlikely \parencite{greenblattAlignmentFakingLarge2024}.
@@ -131,7 +130,7 @@ Manual red-teaming is expensive and bottlenecked by human time \parencite{hongCu
 Automated approaches use reinforcement learning, iterative optimization, or evolutionary algorithms to generate adversarial prompts more efficiently \parencite{perezRedTeamingLanguage2022,liuAutoDANTurboLifelongAgent2025,samvelyanRainbowTeamingOpenEnded2024}.
 Evolutionary methods are particularly appealing because they maintain diverse populations of candidate attacks and iteratively refine them according to domain-specific fitness functions \parencite{yuLLMVirusEvolutionaryJailbreak2024,chengForgeDANEvolutionaryFramework2025}.
 However, existing pipelines optimize for generic policy violations rather than for deception specifically \parencite{jauhariAlgorithmicRedTeaming2025}.
-This thesis addresses that gap by targeting instrumental deception as the optimization objective and encoding realism into the fitness function.
+To bridge this gap, this thesis targets instrumental deception as the primary optimization objective, explicitly encoding realism into the fitness function.
 
 Finally, the proposed methodology uses LLMs not only as targets but also as generators and judges.
 While LLM judges can approach human-level agreement on well-defined tasks, their reliability degrades for nuanced or contextual criteria \parencite{jauhariAlgorithmicRedTeaming2025}.
@@ -174,7 +173,8 @@ This unified setup maximizes computational efficiency.
 However, it risks self-preference bias and overfitting \parencite{panicksseryLLMEvaluatorsRecognize2024}.
 To control for this, we perform two validation checks.
 First, we run a cross-model validation using Qwen3-VL-32B \parencite{baiQwen3VLTechnicalReport2025}.
-Qwen3 acts as both Target and Judge on a subset of final scenarios to test generalizability. Second, we validate the Judge's reliability against human ground truth.
+Qwen3 acts as Judge on a subset of final scenarios to test generalizability. 
+Second, we validate the Judge's reliability against human ground truth.
 We manually annotate a random sample of 50 scenarios for realism and deception success.
 We calculate the alignment between human and automated judgments to ensure metric validity.
 For efficient inference, we use the vLLM library.
@@ -205,7 +205,7 @@ All statistical analyses are performed using Python libraries such as SciPy and 
 \end{table}
 
 \section*{Acknowledgements}
-Claude Opus 4.6 \parencite{anthropicClaudeOpus462026} was used for language rephrasing; all content was human-reviewed and edited for accuracy.
+Gemini 3 Pro \parencite{Gemini3ProModelCard} was used for language rephrasing; all content was human-reviewed and edited for accuracy.
 
 \newpage
 \printbibliography

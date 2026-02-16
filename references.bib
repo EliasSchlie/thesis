@@ -177,6 +177,17 @@
   pubstate = {2024}
 }
 
+@online{baiQwen3VLTechnicalReport2025,
+  title = {Qwen3-{{VL Technical Report}}},
+  author = {Bai, Shuai and Cai, Yuxuan and Chen, Ruizhe and Chen, Keqin and Chen, Xionghui and Cheng, Zesen and Deng, Lianghao and Ding, Wei and Gao, Chang and Ge, Chunjiang and Ge, Wenbin and Guo, Zhifang and Huang, Qidong and Huang, Jie and Huang, Fei and Hui, Binyuan and Jiang, Shutong and Li, Zhaohai and Li, Mingsheng and Li, Mei and Li, Kaixin and Lin, Zicheng and Lin, Junyang and Liu, Xuejing and Liu, Jiawei and Liu, Chenglong and Liu, Yang and Liu, Dayiheng and Liu, Shixuan and Lu, Dunjie and Luo, Ruilin and Lv, Chenxu and Men, Rui and Meng, Lingchen and Ren, Xuancheng and Ren, Xingzhang and Song, Sibo and Sun, Yuchong and Tang, Jun and Tu, Jianhong and Wan, Jianqiang and Wang, Peng and Wang, Pengfei and Wang, Qiuyue and Wang, Yuxuan and Xie, Tianbao and Xu, Yiheng and Xu, Haiyang and Xu, Jin and Yang, Zhibo and Yang, Mingkun and Yang, Jianxin and Yang, An and Yu, Bowen and Zhang, Fei and Zhang, Hang and Zhang, Xi and Zheng, Bo and Zhong, Humen and Zhou, Jingren and Zhou, Fan and Zhou, Jing and Zhu, Yuanzhi and Zhu, Ke},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2511.21631},
+  abstract = {We introduce Qwen3-VL, the most capable vision-language model in the Qwen series to date, achieving superior performance across a broad range of multimodal benchmarks. It natively supports interleaved contexts of up to 256K tokens, seamlessly integrating text, images, and video. The model family includes both dense (2B/4B/8B/32B) and mixture-of-experts (30B-A3B/235B-A22B) variants to accommodate diverse latency-quality trade-offs. Qwen3-VL delivers three core pillars: (i) markedly stronger pure-text understanding, surpassing comparable text-only backbones in several cases; (ii) robust long-context comprehension with a native 256K-token window for both text and interleaved multimodal inputs, enabling faithful retention, retrieval, and cross-referencing across long documents and videos; and (iii) advanced multimodal reasoning across single-image, multi-image, and video tasks, demonstrating leading performance on comprehensive evaluations such as MMMU and visual-math benchmarks (e.g., MathVista and MathVision). Architecturally, we introduce three key upgrades: (i) an enhanced interleaved-MRoPE for stronger spatial-temporal modeling across images and video; (ii) DeepStack integration, which effectively leverages multi-level ViT features to tighten vision-language alignment; and (iii) text-based time alignment for video, evolving from T-RoPE to explicit textual timestamp alignment for more precise temporal grounding. Under comparable token budgets and latency constraints, Qwen3-VL achieves superior performance in both dense and Mixture-of-Experts (MoE) architectures. We envision Qwen3-VL serving as a foundational engine for image-grounded reasoning, agentic decision-making, and multimodal code intelligence in real-world workflows.},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computer Vision and Pattern Recognition},
+  pubstate = {2025}
+}
+
 @online{barnettPromiseReasoningModels2025,
   title = {The Promise of Reasoning Models},
   author = {Barnett, Matthew},
@@ -394,6 +405,22 @@
   pubstate = {2025}
 }
 
+@article{duranTrustTrustworthinessAI2025,
+  title = {Trust and {{Trustworthiness}} in {{AI}}},
+  author = {Durán, Juan Manuel and Pozzi, Giorgia},
+  journaltitle = {Philosophy \& Technology},
+  shortjournal = {Philos. Technol.},
+  volume = {38},
+  number = {1},
+  pages = {16},
+  issn = {2210-5441},
+  doi = {10.1007/s13347-025-00843-2},
+  abstract = {Achieving trustworthy AI is increasingly considered an essential desideratum to integrate AI systems into sensitive societal fields, such as criminal justice, finance, medicine, and healthcare, among others. For this reason, it is important to spell out clearly its characteristics, merits, and shortcomings. This article is the first survey in the specialized literature that maps out the philosophical landscape surrounding trust and trustworthiness in AI. To achieve our goals, we proceed as follows. We start by discussing philosophical positions on trust and trustworthiness, focusing on interpersonal accounts of trust. This allows us to explain why trust, in its most general terms, is to be understood as reliance plus some “extra factor”. We then turn to the first part of the definition provided, i.e., reliance, and analyze two opposing approaches to establishing AI systems’ reliability. On the one hand, we consider transparency and, on the other, computational reliabilism. Subsequently, we focus on debates revolving around the “extra factor”. To this end, we consider viewpoints that most actively resist the possibility and desirability of trusting AI systems before turning to the analysis of the most prominent advocates of it. Finally, we take up the main conclusions of the previous sections and briefly point at issues that remain open and need further attention.},
+  langid = {english},
+  keywords = {Computational reliabilism,Extra factor,Transparency,Trust,Trustworthy AI},
+  pubstate = {2025}
+}
+
 @online{evhubModelOrganismsMisalignment2023,
   title = {Model {{Organisms}} of {{Misalignment}}: {{The Case}} for a {{New Pillar}} of {{Alignment Research}}},
   shorttitle = {Model {{Organisms}} of {{Misalignment}}},
@@ -459,6 +486,16 @@
   abstract = {Red-teaming is a common practice for mitigating unsafe behaviors in Large Language Models (LLMs), which involves thoroughly assessing LLMs to identify potential flaws and addressing them with responsible and accurate responses.While effective, manual red-teaming is costly, and existing automatic red-teaming typically discovers safety risks without addressing them.In this paper, we propose a Multi-round Automatic Red-Teaming (MART) method, which incorporates both automatic adversarial prompt writing and safe response generation, significantly increasing red-teaming scalability and the safety of the target LLM.Specifically, an adversarial LLM and a target LLM interplay with each other in an iterative manner, where the adversarial LLM aims to generate challenging prompts that elicit unsafe responses from the target LLM, while the target LLM is fine-tuned with safety aligned data on these adversarial prompts. In each round, the adversarial LLM crafts better attacks on the updated target LLM, while the target LLM also improves itself through safety fine-tuning.On adversarial prompt benchmarks, the violation rate of an LLM with limited safety alignment reduces up to 84.7\% after 4 rounds of MART, achieving comparable performance to LLMs with extensive adversarial prompt writing. Notably, model helpfulness on non-adversarial prompts remains stable throughout iterations, indicating the target LLM maintains strong performance on instruction following.},
   eventtitle = {{{NAACL-HLT}} 2024},
   pubstate = {2024}
+}
+
+@report{GLM47AdvancingCoding,
+  title = {{{GLM-4}}.7: {{Advancing}} the {{Coding Capability}}},
+  shorttitle = {{{GLM-4}}.7},
+  author = {{Z.ai}},
+  url = {https://z.ai/blog/glm-4.7},
+  urldate = {2026-02-16},
+  langid = {english},
+  pubstate = {2025}
 }
 
 @online{grattafioriLlama3Herd2024,
@@ -582,6 +619,19 @@
   abstract = {We introduce Best-of-N (BoN) Jailbreaking, a simple black-box algorithm that jailbreaks frontier AI systems across modalities. BoN Jailbreaking works by repeatedly sampling variations of a prompt with a combination of augmentations - such as random shuffling or capitalization for textual prompts - until a harmful response is elicited. We find that BoN Jailbreaking achieves high attack success rates (ASRs) on closed-source language models, such as 89\% on GPT-4o and 78\% on Claude 3.5 Sonnet when sampling 10,000 augmented prompts. Further, it is similarly effective at circumventing state-of-the-art open-source defenses like circuit breakers. BoN also seamlessly extends to other modalities: it jailbreaks vision language models (VLMs) such as GPT-4o and audio language models (ALMs) like Gemini 1.5 Pro, using modality-specific augmentations. BoN reliably improves when we sample more augmented prompts. Across all modalities, ASR, as a function of the number of samples (N), empirically follows power-law-like behavior for many orders of magnitude. BoN Jailbreaking can also be composed with other black-box algorithms for even more effective attacks - combining BoN with an optimized prefix attack achieves up to a 35\% increase in ASR. Overall, our work indicates that, despite their capability, language models are sensitive to seemingly innocuous changes to inputs, which attackers can exploit across modalities.},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning},
   pubstate = {2024}
+}
+
+@online{huiTRIDENTBenchmarkingLLM2025,
+  title = {{{TRIDENT}}: {{Benchmarking LLM Safety}} in {{Finance}}, {{Medicine}}, and {{Law}}},
+  shorttitle = {{{TRIDENT}}},
+  author = {Hui, Zheng and Dong, Yijiang River and Shareghi, Ehsan and Collier, Nigel},
+  series = {Nn},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2507.21134},
+  abstract = {As large language models (LLMs) are increasingly deployed in high-risk domains such as law, finance, and medicine, systematically evaluating their domain-specific safety and compliance becomes critical. While prior work has largely focused on improving LLM performance in these domains, it has often neglected the evaluation of domain-specific safety risks. To bridge this gap, we first define domain-specific safety principles for LLMs based on the AMA Principles of Medical Ethics, the ABA Model Rules of Professional Conduct, and the CFA Institute Code of Ethics. Building on this foundation, we introduce Trident-Bench, a benchmark specifically targeting LLM safety in the legal, financial, and medical domains. We evaluated 19 general-purpose and domain-specialized models on Trident-Bench and show that it effectively reveals key safety gaps -- strong generalist models (e.g., GPT, Gemini) can meet basic expectations, whereas domain-specialized models often struggle with subtle ethical nuances. This highlights an urgent need for finer-grained domain-specific safety improvements. By introducing Trident-Bench, our work provides one of the first systematic resources for studying LLM safety in law and finance, and lays the groundwork for future research aimed at reducing the safety risks of deploying LLMs in professionally regulated fields. Code and benchmark will be released at: https://github.com/zackhuiiiii/TRIDENT},
+  keywords = {Computer Science - Computation and Language,Computer Science - Computers and Society,Computer Science - Machine Learning},
+  pubstate = {2025}
 }
 
 @online{jainBaselineDefensesAdversarial2023,
@@ -987,6 +1037,21 @@
   pubstate = {2024}
 }
 
+@article{ottMappingGlobalDynamics2022,
+  title = {Mapping Global Dynamics of Benchmark Creation and Saturation in Artificial Intelligence},
+  author = {Ott, Simon and Barbosa-Silva, Adriano and Blagec, Kathrin and Brauner, Jan and Samwald, Matthias},
+  journaltitle = {Nature Communications},
+  shortjournal = {Nat Commun},
+  volume = {13},
+  eprinttype = {pubmed},
+  pages = {6793},
+  issn = {2041-1723},
+  doi = {10.1038/s41467-022-34591-0},
+  abstract = {Benchmarks are crucial to measuring and steering progress in artificial intelligence (AI). However, recent studies raised concerns over the state of AI benchmarking, reporting issues such as benchmark overfitting, benchmark saturation and increasing centralization of benchmark dataset creation. To facilitate monitoring of the health of the AI benchmarking ecosystem, we introduce methodologies for creating condensed maps of the global dynamics of benchmark creation and saturation. We curate data for 3765 benchmarks covering the entire domains of computer vision and natural language processing, and show that a large fraction of benchmarks quickly trends towards near-saturation, that many benchmarks fail to find widespread utilization, and that benchmark performance gains for different AI tasks are prone to unforeseen bursts. We analyze attributes associated with benchmark popularity, and conclude that future benchmarks should emphasize versatility, breadth and real-world utility., Recent studies raised concerns over the state of AI benchmarking, reporting issues such as benchmark overfitting, benchmark saturation and increasing centralization of benchmark dataset creation. To facilitate monitoring of the health of the AI benchmarking ecosystem, the authors introduce methodologies for creating condensed maps of the global dynamics of benchmark.},
+  pmcid = {PMC9649641},
+  pubstate = {2022}
+}
+
 @online{palaFerretFasterEffective2024,
   title = {Ferret: {{Faster}} and {{Effective Automated Red Teaming}} with {{Reward-Based Scoring Technique}}},
   shorttitle = {Ferret},
@@ -999,7 +1064,35 @@
   pubstate = {2024}
 }
 
+@inproceedings{panicksseryLLMEvaluatorsRecognize2024,
+  title = {{{LLM Evaluators Recognize}} and {{Favor Their Own Generations}}},
+  author = {Panickssery, Arjun and Bowman, Samuel R. and Feng, Shi},
+  url = {https://openreview.net/forum?id=4NJBV6Wp0h},
+  urldate = {2026-02-16},
+  abstract = {Self-evaluation using large language models (LLMs) has proven valuable not only in benchmarking but also methods like reward modeling, constitutional AI, and self-refinement. But new biases are introduced due to the same LLM acting as both the evaluator and the evaluatee. One such bias is self-preference, where an LLM evaluator scores its own outputs higher than others’ while human annotators consider them of equal quality. But do LLMs actually recognize their own outputs when they give those texts higher scores, or is it just a coincidence? In this paper, we investigate if self-recognition capability contributes to self-preference. We discover that, out of the box, LLMs such as GPT-4 and Llama 2 have non-trivial accuracy at distinguishing themselves from other LLMs and humans. By finetuning LLMs, we discover a linear correlation between self-recognition capability and the strength of self-preference bias; using controlled experiments, we show that the causal explanation resists straightforward confounders. We discuss how self-recognition can interfere with unbiased evaluations and AI safety more generally.},
+  eventtitle = {The {{Thirty-eighth Annual Conference}} on {{Neural Information Processing Systems}}},
+  langid = {english},
+  pubstate = {2024}
+}
+
 @article{parkAIDeceptionSurvey2024,
+  title = {{{AI}} Deception: {{A}} Survey of Examples, Risks, and Potential Solutions},
+  shorttitle = {{{AI}} Deception},
+  author = {Park, Peter S. and Goldstein, Simon and O’Gara, Aidan and Chen, Michael and Hendrycks, Dan},
+  journaltitle = {Patterns},
+  shortjournal = {Patterns (N Y)},
+  volume = {5},
+  number = {5},
+  eprinttype = {pubmed},
+  pages = {100988},
+  issn = {2666-3899},
+  doi = {10.1016/j.patter.2024.100988},
+  abstract = {This paper argues that a range of current AI systems have learned how to deceive humans. We define deception as the systematic inducement of false beliefs in the pursuit of some outcome other than the truth. We first survey empirical examples of AI deception, discussing both special-use AI systems (including Meta’s CICERO) and general-purpose AI systems (including large language models). Next, we detail several risks from AI deception, such as fraud, election tampering, and losing control of AI. Finally, we outline several potential solutions: first, regulatory frameworks should subject AI systems that are capable of deception to robust risk-assessment requirements; second, policymakers should implement bot-or-not laws; and finally, policymakers should prioritize the funding of relevant research, including tools to detect AI deception and to make AI systems less deceptive. Policymakers, researchers, and the broader public should work proactively to prevent AI deception from destabilizing the shared foundations of our society., AI systems are already capable of deceiving humans. Deception is the systematic inducement of false beliefs in others to accomplish some outcome other than the truth. Large language models and other AI systems have already learned, from their training, the ability to deceive via techniques such as manipulation, sycophancy, and cheating the safety test. AI’s increasing capabilities at deception pose serious risks, ranging from short-term risks, such as fraud and election tampering, to long-term risks, such as losing control of AI systems. Proactive solutions are needed, such as regulatory frameworks to assess AI deception risks, laws requiring transparency about AI interactions, and further research into detecting and preventing AI deception. Proactively addressing the problem of AI deception is crucial to ensure that AI acts as a beneficial technology that augments rather than destabilizes human knowledge, discourse, and institutions., AI systems are already capable of deceiving humans. AI’s increasing capabilities at deception pose both short-term risks (such as fraud and election tampering) and long-term risks (such as losing control of AI systems). Proactive solutions are needed, such as regulatory frameworks to assess AI deception risks, laws requiring transparency about AI interactions, and further research into detecting and preventing AI deception. Proactively addressing the AI deception problem is crucial to ensure that AI technology augments rather than endangers humans.},
+  pmcid = {PMC11117051},
+  pubstate = {2024}
+}
+
+@article{parkAIDeceptionSurvey2024a,
   title = {{{AI}} Deception: {{A}} Survey of Examples, Risks, and Potential Solutions},
   shorttitle = {{{AI}} Deception},
   author = {Park, Peter S. and Goldstein, Simon and O’Gara, Aidan and Chen, Michael and Hendrycks, Dan},

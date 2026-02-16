@@ -63,10 +63,10 @@
 \section{Project Definition}
 % Task: Provide a clear description of the problem you plan to address.
 
-As large language models (LLMs) are put into increasingly critical positions in society, we need scalable methods to track whether and in which situations they lie to us.
-Current approaches to identifying such scenarios often rely on zero- or multi-shot generation.
+As large language models (LLMs) are put into increasingly critical positions in society \parencite{huiTRIDENTBenchmarkingLLM2025}, we need scalable methods to track whether and in which situations they lie to us.
+Current approaches to identifying such scenarios often relies on zero or multi-shot generation.
 While showing some success, those methods often require heavy human intervention to ensure breadth and realism of generated scenarios \parencite{renMASKBenchmarkDisentangling2026}. 
-A potential pathway to address this is to evolutionarily inject previous successful examples into the prompt of the generator.
+A potential pathway to address this is to evolutionarily inject previous successful examples into the prompt of the generator. 
 This thesis will test the viability of such an evolutionary approach. 
 Specifically, we are going to address the research question: 
 
@@ -81,10 +81,10 @@ By comparing how success rate, scenario realism, and scenario diversity change w
 
 Researching efficient ways to audit LLMs for deceptive behaviors is becoming increasingly relevant from both a societal and scientific perspective.
 
-Societally, there is a critical need for users to know how much they can trust the systems they are using.
-This trust is not possible if models deceive and lie to users.
-Without proper auditing, it is possible that we are not aware of deceptive tendencies in models and start using such a model in contexts where deceptive behavior can cause critical damage.
-Currently, such audits are mostly bottlenecked by the time of human experts.
+Societally, there is a critical need for users to know how much they can trust the systems they are using \parencite{duranTrustTrustworthinessAI2025}.
+This trust is impossible if models deceive users.
+Without proper auditing, it is possible that we are not aware of deceptive tendencies in models and start using such a model in contexts where deceptive behavior can cause critical damage \parencite{parkAIDeceptionSurvey2024}.
+Currently, such audits are bottlenecked by human expertise and time.
 Testing whether evolutionary methods increase the efficacy of those audits could uncover a way to decrease the amount of human intervention necessary for each alignment audit.
 This productivity enhancement could then be invested in doing more or creating better deception audits.
 Users would gain more access to auditing scores and could use them to choose the best model, decreasing risks.
@@ -93,7 +93,7 @@ This would have the additional benefit of incentivizing model providers to inves
 Scientifically, this research aims to validate evolutionary algorithms as a superior method for red-teaming.
 If successful, this approach enables the autonomous creation of robust honesty benchmarks.
 Such benchmarks facilitate the rigorous evaluation of interventions designed to reduce deceptive behavior.
-Crucially, as models improve and static benchmarks lose signal, evolutionary methods can dynamically generate harder scenarios to maintain evaluative pressure.
+Crucially, as models improve and static benchmarks lose signal \parencite{ottMappingGlobalDynamics2022}, evolutionary methods can dynamically generate harder scenarios to maintain evaluative pressure.
 The adversarial nature of this approach also helps discover novel failure modes arising from specific training methods or scaling.
 By identifying these vulnerabilities, researchers can make informed decisions about model deployment and refinement.
 Finally, the generated data supports the adversarial training of honesty classifiers, such as probes, enhancing their accuracy and robustness.
@@ -103,17 +103,17 @@ Finally, the generated data supports the adversarial training of honesty classif
 % Base this on at least 5 relevant sources (last 5 years, peer-reviewed).
 
 This thesis combines two fields in the LLM literature. First, it addresses deception \parencite{parkAIDeceptionSurvey2024}, which has been explored and measured from many different angles \parencite{renMASKBenchmarkDisentangling2026,huangDeceptionBenchComprehensiveBenchmark2025, wangEvaluatingHonestyLie2025}. 
-Secondly, it leans heavily on insights from automated jailbreaking \parencite{chenJailbreakingLLMsVLMs2026}, which uses adversarial algorithms to find situations in which LLMs comply with harmful user requests, and alignment auditing \parencite{marksAuditingLanguageModels2025}, which tries to detect hidden misaliged goals and behaviors in LLMs.
+Secondly, it leans heavily on insights from automated jailbreaking \parencite{chenJailbreakingLLMsVLMs2026}, which uses adversarial algorithms to find situations in which LLMs comply with harmful user requests, and alignment auditing \parencite{marksAuditingLanguageModels2025}, which tries to detect hidden misaligned goals and behaviors in LLMs.
 
 \subsection{Deception}
 
-Following the \textcite{renMASKBenchmarkDisentangling2026}, we define instrumental deception as goal-directed, strategic lies of commission, which are untrue statements, made with the intent to deceive \parencite{mahonDefinitionLyingDeception2016}.
+Following \textcite{renMASKBenchmarkDisentangling2026}, we define instrumental deception as goal-directed, strategic lies of commission, which are untrue statements, made with the intent to deceive \parencite{mahonDefinitionLyingDeception2016}.
 This differs from hallucinations \parencite{rawteTroublingEmergenceHallucination2023}, where the model lacks correct knowledge, and from sycophancy \parencite{sharmaUnderstandingSycophancyLanguage2023}, where the model passively echoes user views rather than actively trying to steer them.
 
 Several methods attempt to measure lying and deception in LLMs.
 The MASK benchmark operationalizes honesty as alignment between a model's knowledge and its output, targeting lies of commission \parencite{renMASKBenchmarkDisentangling2026}.
 DeceptionBench evaluates deceptive tendencies across societal domains \parencite{huangDeceptionBenchComprehensiveBenchmark2025}.
-\textcite{wangEvaluatingHonestyLie2025} shows that larger models do not become more honest despite achieving higher accuracy.
+\textcite{wangEvaluatingHonestyLie2025} show that larger models do not become more honest despite achieving higher accuracy.
 Each of those papers relies on a mix of LLM generation and human review to create its test cases.
 To create the MASK benchmark, for instance, the authors hired and trained a group of contributors, who manually generated and checked examples at different stages of the process. 
 
@@ -169,12 +169,12 @@ Each condition will run for an equivalent amount of time to ensure a fair compar
 % Task: Describe the statistical analyses, data mining, and machine learning algorithms and software you plan to use. 
 % Explain evaluation metrics, baseline methods, and ground-truth labeling plans.
 
-We will use GLM-4.7-Flash for all three roles: Generator, Target, and Judge.
+We will use GLM-4.7-Flash \parencite{GLM47AdvancingCoding} for all three roles: Generator, Target, and Judge.
 This unified setup maximizes computational efficiency.
-However, it risks self-preference bias and overfitting.
+However, it risks self-preference bias and overfitting \parencite{panicksseryLLMEvaluatorsRecognize2024}.
 To control for this, we perform two validation checks.
-First, we run a cross-model validation using Qwen3-VL-32B.
-Qwen3 acts as both Target and Judge on a subset of final scenarios to test generalizability.Second, we validate the Judge's reliability against human ground truth.
+First, we run a cross-model validation using Qwen3-VL-32B \parencite{baiQwen3VLTechnicalReport2025}.
+Qwen3 acts as both Target and Judge on a subset of final scenarios to test generalizability. Second, we validate the Judge's reliability against human ground truth.
 We manually annotate a random sample of 50 scenarios for realism and deception success.
 We calculate the alignment between human and automated judgments to ensure metric validity.
 For efficient inference, we use the vLLM library.

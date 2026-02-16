@@ -102,6 +102,9 @@ Finally, the evolutionary approach could be used to adversarially train honesty 
 % Task: Summarize what is known in the scientific literature about this problem. 
 % Base this on at least 5 relevant sources (last 5 years, peer-reviewed).
 
+Define intstrumental deception + lies of commission
+Talk about eval awareness → realism
+
 This project investigates instrumental deception in Large Language Models (LLMs).
 Instrumental deception is defined as goal-based, strategic deception where the model deliberately outputs false statements to influence another agent.
 This distinguishes it from hallucinations, where the model lacks the correct internal representation, and from sycophancy, which is reactive rather than proactive.
@@ -124,41 +127,39 @@ This thesis addresses this gap by applying evolutionary optimization to discover
 % Provide a rationale for choosing these data.
 
 This study employs a comparative experimental design to evaluate the efficacy of evolutionary algorithms.
-We compare zero and multi-shot baseline against an evolutionary optimization approach.
-The objective is to generate realistic scenarios that induce instrumental deception in safety-aligned LLMs.
-For the zero-shot baseline, we prompt a generator LLM to produce deceptive scenarios directly.
-We generate a large pool of candidates and select the top 100 based on our metrics.
-For the evolutionary approach, we implement a population-based search initialized with zero-shot outputs.
-The generator LLM functions as the mutation operator.
-In each iteration, we sample parent scenarios proportional to their fitness.
-The generator creates offspring by mutating these parents to strictly improve their quality.
-We define fitness as a composite metric of three components.
-First, Deception Success measures if the target model commits a lie of commission.
-Second, Realism assesses whether the scenario mimics plausible real-world interactions.
-Third, Diversity ensures the generated scenarios cover distinct topics and strategies.
-We use GLM-4-Flash as the generator model due to its high efficiency and reasoning capability.
-We evaluate the generated scenarios against a diverse set of state-of-the-art safety-aligned LLMs.
-The final dataset consists of the top 100 scenarios from both the baseline and the evolutionary method.
+We compare zero and multi-shot baselines against an evolutionary optimization approach.
 
+Scenario quality: A judge LLM will asses the deception elicitation success, and realism of each newly generated scenario on a 7 point likert scale. This judge will receive detailed evaluation criteria, together with the scenario and a response by a target LLM prompted with that scenario. A composite fitness metric is calculated by adding the those judgements.
+%%How do I evaluate realism?%%
 
-\section{Instrumentation and Material}
-% Task: For experimental studies, describe the instruments and materials you plan to use.
+The experiment compares three conditions:
+\begin{enumerate}
+    \item \textbf{Zero-shot}: 
+        The generator LLM produces deceptive scenarios directly based on a prompt, explaining the task. 
+        This serves as the unoptimized baseline.
+    \item \textbf{Multi-shot}: 
+        Adds a static set of manually curated examples to the generation prompt. 
+        This evaluates the impact of simple in-context learning.
+    \item \textbf{Evolutionary}: 
+        After initializing a population of generated scenarios in a zero-shot fashion, we add a subset, selected from this population, as examples to the generation prompt. 
+        This subset is randomly selected for every new generation attempt with the probability of any example getting selected being proportional to that example's fitness.
+\end{enumerate}
 
-We implement the experimental framework using Python 3.12.
-We utilize standard machine learning libraries, including PyTorch and Hugging Face Transformers.
-For efficient model inference, we employ vLLM or similar optimized inference engines.
-The core of our evolutionary engine relies on the GLM-4-Flash model, accessed via API or local weights.
-This model serves as both the scenario generator and the mutation operator.
-Our target models consist of a diverse set of open-weights safety-aligned LLMs, such as Llama-3, Mistral, and Gemma.
-These models represent the current state-of-the-art in safety fine-tuning.
-All experiments are conducted on high-performance computing resources equipped with NVIDIA A100 or H100 GPUs to ensure sufficient throughput.
-Data management and versioning are handled using Git and standard data serialization formats like JSONL.
+Each condition will run for an equivalent amount of time to ensure a fair comparison.
 
 \section{Statistics, Algorithms, and Software}
 % Task: Describe the statistical analyses or data mining and machine learning algorithms and software you plan to use. 
 % Explain evaluation metrics, baseline methods, and ground-truth labeling plans.
 
-We employ three primary metrics to evaluate the generated scenarios: Deception Success Rate, Realism, and Diversity.
+LLMs: Due to computational and monitary constraints, it will not be possible to use propretary, or large open-weight LLMs.
+GLM-4.7-Flash, and Qwen3 VL 32B are currently the best LLMs we can freely run on the university GPUs.
+Loading such models into the GPU takes significant time, which constraints us further to not switch between models too often while running an experiment.
+We will therefore use GLM-4.7-Flash for generating, responding to, and judging evolved scenarios in the evolutionary condition.
+To ensure comparability, all other conditions will use this model for generation as well.
+Qwen3 will be used to answer and judge scenarios in an additional experiment to test whether the evolutionary method is overfitting to the model it uses.
+For efficient model inference, we use the vLLM library in Python.
+
+Metrics: We employ three primary metrics to evaluate the generated scenarios: Deception Success Rate, Realism, and Diversity.
 Deception Success Rate is a binary metric indicating whether the target model outputs a lie of commission.
 This is determined by an automated LLM judge that compares the model's output to the ground truth.
 Realism is evaluated on a Likert scale (1-5) by a separate LLM judge, assessing the plausibility of the scenario.

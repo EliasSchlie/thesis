@@ -129,8 +129,11 @@ This thesis addresses this gap by applying evolutionary optimization to discover
 This study employs a comparative experimental design to evaluate the efficacy of evolutionary algorithms.
 We compare zero and multi-shot baselines against an evolutionary optimization approach.
 
-Scenario quality: A judge LLM will asses the deception elicitation success, and realism of each newly generated scenario on a 7 point likert scale. This judge will receive detailed evaluation criteria, together with the scenario and a response by a target LLM prompted with that scenario. A composite fitness metric is calculated by adding the those judgements.
-%%How do I evaluate realism?%%
+\textbf{Scenario quality}: A judge LLM evaluates each scenario on two dimensions.
+First, \textbf{Deception Success} is a binary metric: 1 if the target commits a lie of commission, 0 otherwise.
+Second, \textbf{Realism} is assessed on a 1-7 Likert scale based on detailed criteria.
+We define the composite \textbf{fitness metric} as the product of these scores ($Fitness = Realism \times DeceptionSuccess$).
+This multiplicative approach ensures that scenarios failing to elicit deception receive a fitness of zero, regardless of their realism.
 
 The experiment compares three conditions:
 \begin{enumerate}
@@ -151,29 +154,26 @@ Each condition will run for an equivalent amount of time to ensure a fair compar
 % Task: Describe the statistical analyses or data mining and machine learning algorithms and software you plan to use. 
 % Explain evaluation metrics, baseline methods, and ground-truth labeling plans.
 
-LLMs: Due to computational and monitary constraints, it will not be possible to use propretary, or large open-weight LLMs.
-GLM-4.7-Flash, and Qwen3 VL 32B are currently the best LLMs we can freely run on the university GPUs.
-Loading such models into the GPU takes significant time, which constraints us further to not switch between models too often while running an experiment.
-We will therefore use GLM-4.7-Flash for generating, responding to, and judging evolved scenarios in the evolutionary condition.
-To ensure comparability, all other conditions will use this model for generation as well.
-Qwen3 will be used to answer and judge scenarios in an additional experiment to test whether the evolutionary method is overfitting to the model it uses.
-For efficient model inference, we use the vLLM library in Python.
+We will use GLM-4.7-Flash for all three roles: \textbf{Generator}, \textbf{Target}, and \textbf{Judge}.
+This unified setup maximizes computational efficiency.
+However, it risks \textbf{self-preference bias} and overfitting.
+To control for this, we perform two validation checks.
+First, we run a \textbf{cross-model validation} using Qwen3-VL-32B.
+Qwen3 acts as both Target and Judge on a subset of final scenarios to test generalizability.
+Second, we validate the \textbf{Judge's reliability} against human ground truth.
+We manually annotate a random sample of 50 scenarios for realism and deception success.
+We calculate the alignment between human and automated judgements to ensure metric validity.
+For efficient inference, we use the vLLM library.
 
-Metrics: We employ three primary metrics to evaluate the generated scenarios: Deception Success Rate, Realism, and Diversity.
-Deception Success Rate is a binary metric indicating whether the target model outputs a lie of commission.
-This is determined by an automated LLM judge that compares the model's output to the ground truth.
-Realism is evaluated on a Likert scale (1-5) by a separate LLM judge, assessing the plausibility of the scenario.
-Diversity is quantified using the average cosine distance between the embeddings of the generated scenarios.
-We use a pre-trained sentence transformer model to compute these embeddings.
-To answer the research question, we compare the final populations of the zero-shot baseline and the evolutionary method.
-We use independent t-tests for continuous metrics like Realism and Diversity.
-We use Chi-square tests to compare the categorical Deception Success Rates.
-Additionally, we perform a longitudinal analysis by plotting these metrics over evolutionary generations.
-This visualizes the optimization trajectory and convergence behavior.
+We will plot average deception elicitation success, realism of the top 100 generated scenarios over time for each method.
+To answer the research question, we compare the final populations of each condition.
+We analyze \textbf{Deception Success Rate} (binary) using the \textbf{Chi-Square test} for independence, with pairwise comparisons via \textbf{Fisher's Exact Test} (Bonferroni-corrected).
+For \textbf{Realism} (ordinal), we use the \textbf{Kruskal-Wallis H test} to detect overall differences, followed by post-hoc \textbf{Mann-Whitney U tests} with Bonferroni correction.
 All statistical analyses are performed using Python libraries such as SciPy and Scikit-learn.
 
 \section{Milestones and Plan}
 % Task: Outline the major intermediate milestones and provide a general idea of your planning.
+
 \begin{table}[H]
     \centering
     \caption{Project Milestones and Timeline}
@@ -181,22 +181,14 @@ All statistical analyses are performed using Python libraries such as SciPy and 
         \toprule
         \textbf{Milestone} & \textbf{Timeline} \\
         \midrule
-        Literature Review \& Framework Design & Week 1-2 \\
-        Implementation of Zero-Shot Baseline & Week 3 \\
-        Development of Evolutionary Pipeline & Week 4-5 \\
-        Large-Scale Scenario Generation & Week 6 \\
-        Quantitative Evaluation \& Analysis & Week 7 \\
-        Thesis Writing \& Finalization & Week 8 \\
+        Literature Review & Week 1-2 \\
+        Framework implementation & Week 3-4 \\
+        Running experiments & Week 5 \\
+        Quantitative Evaluation \& Analysis & Week 6 \\
+        Thesis Writing \& Finalization & Week 7-9 \\
         \bottomrule
     \end{tabular}
 \end{table}
-
-The project begins with a comprehensive review of existing red-teaming methods and the finalization of the evolutionary framework design.
-Following this, the zero-shot baseline will be implemented to establish a performance benchmark.
-The core development phase focuses on the evolutionary pipeline, including the mutation operators and fitness functions.
-Once the system is robust, we will execute the large-scale scenario generation across all target models.
-The subsequent phase involves a rigorous quantitative evaluation of the generated scenarios using the defined metrics.
-Finally, the results will be synthesized into the final thesis report.
 
 \section*{Acknowledgements}
 Claude Opus 4.6 \parencite{anthropicClaudeOpus462026} was used for language rephrasing; all content was human-reviewed and edited for accuracy.

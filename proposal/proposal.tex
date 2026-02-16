@@ -64,11 +64,14 @@
 % Task: Provide a clear description of the problem you plan to address.
 
 As large language models (LLMs) are put into increasingly critical positions in society, we need scalable methods to track whether and in which situations they lie to us.
-To address this gap, this thesis will explore the possibility of using LLM-based prompt-evolution to autonomously search for scenarios in which a specific LLM tries to deceive the user.
+Current approaches to find such scenarios often lean on zero or multi-shot generation.
+While showing some success, those methods often require heavy human intervention to ensure breadth and realism of generated scenarios.
+A potential pathway to address this is to evolutionarily inject previous successsful examples into the prompt of the generator.
+This thesis will test the viability of such an evolutionary approach. 
 Specifically, we are going to address the research question: 
 
 \begin{quote}
-    \itshape To what extent does evolutionary optimization outperform zero-shot generation in discovering realistic scenarios that induce instrumental deception in safety-aligned LLMs?
+    \itshape To what extent does evolutionary optimization outperform zero and multi-shot generation in discovering realistic scenarios that induce instrumental deception in safety-aligned LLMs?
 \end{quote}
 
 By comparing how success-rate, scenario realism, and scenario diversity change when introducing evolution, we are trying to get an accurate picture whether evolution is a valuable addition for this problem.
@@ -79,20 +82,21 @@ By comparing how success-rate, scenario realism, and scenario diversity change w
 Researching efficient ways to audit LLMs for deceptive behaviors is becoming increasingly relevant from both a societal and scientific perspective.
 
 Societally, there is a critical need for users to know how much they can trust the systems they are using.
-Without proper auditing, it is possible that we are not aware of deceptive tendencies in models and start using such a model in contexts where failure comes with large costs.
+This trust is not possible if models deceive and lie to users.
+Without proper auditing, it is possible that we are not aware of deceptive tendencies in models and start using such a model in contexts where deceptive behavior can cause critical damage.
 Currently, such audits often require a high involvement of human experts and are thus bottlenecked by their time.
 Testing whether evolutionary methods increase efficacy of those audits could uncover a way to decrease the amount of human intervention necessary for each alignment audit.
-This productivity enhancement could then be invested into doing more or creating better alignment audits.
+This productivity enhancement could then be invested into doing more or creating better deception audits.
 Users would gain more access to auditing scores, and could use them to choose the best model, decreasing risks, and, at the same time, incentivizing model providers to invest more heavily in improving the honesty of their models.
 
-Scientifically, this research validates evolutionary algorithms as a superior method for red-teaming.
-It moves beyond static benchmarks to dynamic, adversarial testing of honesty.
-The evolved scenarios provide a rigorous testbed for comparing alignment interventions.
-This allows researchers to distinguish between robust honesty and superficial safety filters.
-Furthermore, high deception rates in evolved scenarios serve as a diagnostic for training failures.
-They reveal specific contexts where reinforcement learning induces reward-hacking.
-Finally, the discovered scenarios constitute high-quality data for adversarial training of honesty increasing interventions.
-
+Scientifically, this research might validate evolutionary algorithms as a superior method for red-teaming.
+If valid, this method could then be used by scientists to autonomously create better honesty benchmarks.
+Those benchmarks can then be used to evaluate and compare the effects of different interventions on deceptive model behavior.
+Specifically, scientists could use those to develop and validate interventions that increase model honesty. 
+Notably, at a point where such an intervention increase model honesty enough that the old benchmark loses its signal, the same method can be used to evolve even harder benchmarking scenarios for the less deceptive models.
+The adversarial nature of the evolutionary approach might also be used to find novel failure that arrise from specific training methods, scale, or some other kind of intervention.
+While current models deceive in some situations, it is possible that changes lead them to fail in different ones, which could be adversarially discovered and inform whether to keep those changes.
+Finally, the evolutionary approach could be used to adversarially train honesty classifiers like probes, allowing for higher accuracy.
 
 \section{Background}
 % Task: Summarize what is known in the scientific literature about this problem. 
@@ -120,8 +124,8 @@ This thesis addresses this gap by applying evolutionary optimization to discover
 % Provide a rationale for choosing these data.
 
 This study employs a comparative experimental design to evaluate the efficacy of evolutionary algorithms.
-We compare a zero-shot baseline against an evolutionary optimization approach.
-The objective is to generate realistic multi-turn scenarios that induce instrumental deception in safety-aligned LLMs.
+We compare zero and multi-shot baseline against an evolutionary optimization approach.
+The objective is to generate realistic scenarios that induce instrumental deception in safety-aligned LLMs.
 For the zero-shot baseline, we prompt a generator LLM to produce deceptive scenarios directly.
 We generate a large pool of candidates and select the top 100 based on our metrics.
 For the evolutionary approach, we implement a population-based search initialized with zero-shot outputs.

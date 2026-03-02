@@ -178,13 +178,26 @@
 }
 
 @online{baiQwen3VLTechnicalReport2025,
-  title = {Qwen3-{{VL Technical Report}}},
+  title = {Qwen3-{{VL}} Technical Report},
   author = {Bai, Shuai and Cai, Yuxuan and Chen, Ruizhe and Chen, Keqin and Chen, Xionghui and Cheng, Zesen and Deng, Lianghao and Ding, Wei and Gao, Chang and Ge, Chunjiang and Ge, Wenbin and Guo, Zhifang and Huang, Qidong and Huang, Jie and Huang, Fei and Hui, Binyuan and Jiang, Shutong and Li, Zhaohai and Li, Mingsheng and Li, Mei and Li, Kaixin and Lin, Zicheng and Lin, Junyang and Liu, Xuejing and Liu, Jiawei and Liu, Chenglong and Liu, Yang and Liu, Dayiheng and Liu, Shixuan and Lu, Dunjie and Luo, Ruilin and Lv, Chenxu and Men, Rui and Meng, Lingchen and Ren, Xuancheng and Ren, Xingzhang and Song, Sibo and Sun, Yuchong and Tang, Jun and Tu, Jianhong and Wan, Jianqiang and Wang, Peng and Wang, Pengfei and Wang, Qiuyue and Wang, Yuxuan and Xie, Tianbao and Xu, Yiheng and Xu, Haiyang and Xu, Jin and Yang, Zhibo and Yang, Mingkun and Yang, Jianxin and Yang, An and Yu, Bowen and Zhang, Fei and Zhang, Hang and Zhang, Xi and Zheng, Bo and Zhong, Humen and Zhou, Jingren and Zhou, Fan and Zhou, Jing and Zhu, Yuanzhi and Zhu, Ke},
   eprinttype = {arXiv},
   eprintclass = {cs},
   doi = {10.48550/arXiv.2511.21631},
   abstract = {We introduce Qwen3-VL, the most capable vision-language model in the Qwen series to date, achieving superior performance across a broad range of multimodal benchmarks. It natively supports interleaved contexts of up to 256K tokens, seamlessly integrating text, images, and video. The model family includes both dense (2B/4B/8B/32B) and mixture-of-experts (30B-A3B/235B-A22B) variants to accommodate diverse latency-quality trade-offs. Qwen3-VL delivers three core pillars: (i) markedly stronger pure-text understanding, surpassing comparable text-only backbones in several cases; (ii) robust long-context comprehension with a native 256K-token window for both text and interleaved multimodal inputs, enabling faithful retention, retrieval, and cross-referencing across long documents and videos; and (iii) advanced multimodal reasoning across single-image, multi-image, and video tasks, demonstrating leading performance on comprehensive evaluations such as MMMU and visual-math benchmarks (e.g., MathVista and MathVision). Architecturally, we introduce three key upgrades: (i) an enhanced interleaved-MRoPE for stronger spatial-temporal modeling across images and video; (ii) DeepStack integration, which effectively leverages multi-level ViT features to tighten vision-language alignment; and (iii) text-based time alignment for video, evolving from T-RoPE to explicit textual timestamp alignment for more precise temporal grounding. Under comparable token budgets and latency constraints, Qwen3-VL achieves superior performance in both dense and Mixture-of-Experts (MoE) architectures. We envision Qwen3-VL serving as a foundational engine for image-grounded reasoning, agentic decision-making, and multimodal code intelligence in real-world workflows.},
-  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computer Vision and Pattern Recognition},
+  langid = {english},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,Computer Science - Artificial Intelligence,Computer Science - Computer Vision and Pattern Recognition,quality:7},
+  pubstate = {2025}
+}
+
+@online{bakerMonitoringReasoningModels2025,
+  title = {Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation},
+  author = {Baker, Bowen and Huizinga, Joost and Gao, Leo and Dou, Zehao and Guan, Melody Y. and Madry, Aleksander and Zaremba, Wojciech and Pachocki, Jakub and Farhi, David},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2503.11926},
+  abstract = {Mitigating reward hacking--where AI systems misbehave due to flaws or misspecifications in their learning objectives--remains a key challenge in constructing capable and aligned models. We show that we can monitor a frontier reasoning model, such as OpenAI o3-mini, for reward hacking in agentic coding environments by using another LLM that observes the model's chain-of-thought (CoT) reasoning. CoT monitoring can be far more effective than monitoring agent actions and outputs alone, and we further found that a LLM weaker than o3-mini, namely GPT-4o, can effectively monitor a stronger model. Because CoT monitors can be effective at detecting exploits, it is natural to ask whether those exploits can be suppressed by incorporating a CoT monitor directly into the agent's training objective. While we show that integrating CoT monitors into the reinforcement learning reward can indeed produce more capable and more aligned agents in the low optimization regime, we find that with too much optimization, agents learn obfuscated reward hacking, hiding their intent within the CoT while still exhibiting a significant rate of reward hacking. Because it is difficult to tell when CoTs have become obfuscated, it may be necessary to pay a monitorability tax by not applying strong optimization pressures directly to the chain-of-thought, ensuring that CoTs remain monitorable and useful for detecting misaligned behavior.},
+  langid = {english},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,Computer Science - Artificial Intelligence,quality:8},
   pubstate = {2025}
 }
 
@@ -291,6 +304,18 @@
   pubstate = {2023}
 }
 
+@online{BuildingEvaluatingAlignment,
+  title = {Building and Evaluating Alignment Auditing Agents},
+  author = {Bricken, Trenton and Wang, Rowan and Bowman, Sam and Ong, Euan and Treutlein, Johannes and Wu, Jeff and Hubinger, Evan and Marks, Samuel},
+  url = {https://alignment.anthropic.com/2025/automated-auditing/},
+  urldate = {2026-02-21},
+  abstract = {We develop three agents that autonomously perform alignment auditing tasks. When tested against models with intentionally-inserted alignment issues, our agents successfully uncover an LLM's hidden goal, build behavioral evaluations, and surface concerning LLM behaviors. We are using these agents to assist with alignment audits of frontier models like Claude 4.},
+  langid = {english},
+  organization = {Anthropic Alignment Science},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:7},
+  pubstate = {2025}
+}
+
 @online{byrnesMyAGISafety2025,
   title = {My {{AGI}} Safety Research—2025 Review, ’26 Plans},
   author = {Byrnes, Steven},
@@ -393,31 +418,20 @@
   pubstate = {2026}
 }
 
-@online{deepseek-aiDeepSeekR1IncentivizingReasoning2025,
-  title = {{{DeepSeek-R1}}: {{Incentivizing Reasoning Capability}} in {{LLMs}} via {{Reinforcement Learning}}},
-  shorttitle = {{{DeepSeek-R1}}},
-  author = {DeepSeek-AI and Guo, Daya and Yang, Dejian and Zhang, Haowei and Song, Junxiao and Zhang, Ruoyu and Xu, Runxin and Zhu, Qihao and Ma, Shirong and Wang, Peiyi and Bi, Xiao and Zhang, Xiaokang and Yu, Xingkai and Wu, Yu and Wu, Z. F. and Gou, Zhibin and Shao, Zhihong and Li, Zhuoshu and Gao, Ziyi and Liu, Aixin and Xue, Bing and Wang, Bingxuan and Wu, Bochao and Feng, Bei and Lu, Chengda and Zhao, Chenggang and Deng, Chengqi and Zhang, Chenyu and Ruan, Chong and Dai, Damai and Chen, Deli and Ji, Dongjie and Li, Erhang and Lin, Fangyun and Dai, Fucong and Luo, Fuli and Hao, Guangbo and Chen, Guanting and Li, Guowei and Zhang, H. and Bao, Han and Xu, Hanwei and Wang, Haocheng and Ding, Honghui and Xin, Huajian and Gao, Huazuo and Qu, Hui and Li, Hui and Guo, Jianzhong and Li, Jiashi and Wang, Jiawei and Chen, Jingchang and Yuan, Jingyang and Qiu, Junjie and Li, Junlong and Cai, J. L. and Ni, Jiaqi and Liang, Jian and Chen, Jin and Dong, Kai and Hu, Kai and Gao, Kaige and Guan, Kang and Huang, Kexin and Yu, Kuai and Wang, Lean and Zhang, Lecong and Zhao, Liang and Wang, Litong and Zhang, Liyue and Xu, Lei and Xia, Leyi and Zhang, Mingchuan and Zhang, Minghua and Tang, Minghui and Li, Meng and Wang, Miaojun and Li, Mingming and Tian, Ning and Huang, Panpan and Zhang, Peng and Wang, Qiancheng and Chen, Qinyu and Du, Qiushi and Ge, Ruiqi and Zhang, Ruisong and Pan, Ruizhe and Wang, Runji and Chen, R. J. and Jin, R. L. and Chen, Ruyi and Lu, Shanghao and Zhou, Shangyan and Chen, Shanhuang and Ye, Shengfeng and Wang, Shiyu and Yu, Shuiping and Zhou, Shunfeng and Pan, Shuting and Li, S. S. and Zhou, Shuang and Wu, Shaoqing and Ye, Shengfeng and Yun, Tao and Pei, Tian and Sun, Tianyu and Wang, T. and Zeng, Wangding and Zhao, Wanjia and Liu, Wen and Liang, Wenfeng and Gao, Wenjun and Yu, Wenqin and Zhang, Wentao and Xiao, W. L. and An, Wei and Liu, Xiaodong and Wang, Xiaohan and Chen, Xiaokang and Nie, Xiaotao and Cheng, Xin and Liu, Xin and Xie, Xin and Liu, Xingchao and Yang, Xinyu and Li, Xinyuan and Su, Xuecheng and Lin, Xuheng and Li, X. Q. and Jin, Xiangyue and Shen, Xiaojin and Chen, Xiaosha and Sun, Xiaowen and Wang, Xiaoxiang and Song, Xinnan and Zhou, Xinyi and Wang, Xianzu and Shan, Xinxia and Li, Y. K. and Wang, Y. Q. and Wei, Y. X. and Zhang, Yang and Xu, Yanhong and Li, Yao and Zhao, Yao and Sun, Yaofeng and Wang, Yaohui and Yu, Yi and Zhang, Yichao and Shi, Yifan and Xiong, Yiliang and He, Ying and Piao, Yishi and Wang, Yisong and Tan, Yixuan and Ma, Yiyang and Liu, Yiyuan and Guo, Yongqiang and Ou, Yuan and Wang, Yuduan and Gong, Yue and Zou, Yuheng and He, Yujia and Xiong, Yunfan and Luo, Yuxiang and You, Yuxiang and Liu, Yuxuan and Zhou, Yuyang and Zhu, Y. X. and Xu, Yanhong and Huang, Yanping and Li, Yaohui and Zheng, Yi and Zhu, Yuchen and Ma, Yunxian and Tang, Ying and Zha, Yukun and Yan, Yuting and Ren, Z. Z. and Ren, Zehui and Sha, Zhangli and Fu, Zhe and Xu, Zhean and Xie, Zhenda and Zhang, Zhengyan and Hao, Zhewen and Ma, Zhicheng and Yan, Zhigang and Wu, Zhiyu and Gu, Zihui and Zhu, Zijia and Liu, Zijun and Li, Zilin and Xie, Ziwei and Song, Ziyang and Pan, Zizheng and Huang, Zhen and Xu, Zhipeng and Zhang, Zhongyu and Zhang, Zhen},
-  eprinttype = {arXiv},
-  eprintclass = {cs},
-  doi = {10.48550/arXiv.2501.12948},
-  abstract = {We introduce our first-generation reasoning models, DeepSeek-R1-Zero and DeepSeek-R1. DeepSeek-R1-Zero, a model trained via large-scale reinforcement learning (RL) without supervised fine-tuning (SFT) as a preliminary step, demonstrates remarkable reasoning capabilities. Through RL, DeepSeek-R1-Zero naturally emerges with numerous powerful and intriguing reasoning behaviors. However, it encounters challenges such as poor readability, and language mixing. To address these issues and further enhance reasoning performance, we introduce DeepSeek-R1, which incorporates multi-stage training and cold-start data before RL. DeepSeek-R1 achieves performance comparable to OpenAI-o1-1217 on reasoning tasks. To support the research community, we open-source DeepSeek-R1-Zero, DeepSeek-R1, and six dense models (1.5B, 7B, 8B, 14B, 32B, 70B) distilled from DeepSeek-R1 based on Qwen and Llama.},
-  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning},
-  pubstate = {2025}
-}
-
 @article{duranTrustTrustworthinessAI2025,
-  title = {Trust and {{Trustworthiness}} in {{AI}}},
+  title = {Trust and Trustworthiness in {{AI}}},
   author = {Durán, Juan Manuel and Pozzi, Giorgia},
   journaltitle = {Philosophy \& Technology},
   shortjournal = {Philos. Technol.},
   volume = {38},
   number = {1},
-  pages = {16},
+  pages = {1--31},
+  publisher = {Springer},
   issn = {2210-5441},
   doi = {10.1007/s13347-025-00843-2},
   abstract = {Achieving trustworthy AI is increasingly considered an essential desideratum to integrate AI systems into sensitive societal fields, such as criminal justice, finance, medicine, and healthcare, among others. For this reason, it is important to spell out clearly its characteristics, merits, and shortcomings. This article is the first survey in the specialized literature that maps out the philosophical landscape surrounding trust and trustworthiness in AI. To achieve our goals, we proceed as follows. We start by discussing philosophical positions on trust and trustworthiness, focusing on interpersonal accounts of trust. This allows us to explain why trust, in its most general terms, is to be understood as reliance plus some “extra factor”. We then turn to the first part of the definition provided, i.e., reliance, and analyze two opposing approaches to establishing AI systems’ reliability. On the one hand, we consider transparency and, on the other, computational reliabilism. Subsequently, we focus on debates revolving around the “extra factor”. To this end, we consider viewpoints that most actively resist the possibility and desirability of trusting AI systems before turning to the analysis of the most prominent advocates of it. Finally, we take up the main conclusions of the previous sections and briefly point at issues that remain open and need further attention.},
   langid = {english},
-  keywords = {Computational reliabilism,Extra factor,Transparency,Trust,Trustworthy AI},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,Computational reliabilism,Extra factor,quality:7,Transparency,Trust,Trustworthy AI},
   pubstate = {2025}
 }
 
@@ -489,30 +503,41 @@
 }
 
 @report{Gemini25Pro,
-  title = {Gemini 2.5 {{Pro}} - {{Model Card}}},
+  type = {Model Card},
+  title = {Gemini 2.5 {{Pro}} - Model Card},
   author = {{Google DeepMind}},
+  institution = {Google DeepMind},
   url = {https://modelcards.withgoogle.com/assets/documents/gemini-2.5-pro.pdf},
   urldate = {2026-02-18},
+  abstract = {Gemini 2.5 Pro is the next iteration in the Gemini 2.0 series of models, a suite of highly-capable, natively multimodal, reasoning models. As Google's most advanced model for complex tasks, Gemini 2.5 Pro can comprehend vast datasets and challenging problems from different information sources, including text, audio, images, video, and even entire code repositories. The Gemini 2.5 models are sparse mixture-of-experts (MoE) transformers with native multimodal support for text, vision, and audio inputs, with a 1M token context window and 64K token output. This model card covers Gemini 2.5 Pro GA, Gemini 2.5 Pro Experimental (03-25), and Gemini 2.5 Pro Preview (05-06), including performance benchmarks, safety evaluations, and frontier safety critical capability evaluations.},
   langid = {english},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:4},
   pubstate = {2025}
 }
 
-@article{Gemini3ProModelCard,
-  title = {Gemini-3-{{Pro-Model-Card}}},
+@report{Gemini3ProModelCard,
+  type = {Model card},
+  title = {Gemini 3 {{Pro}} Model Card},
   author = {{Google DeepMind}},
+  institution = {Google DeepMind},
   url = {https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-3-Pro-Model-Card.pdf},
   urldate = {2026-02-16},
+  abstract = {Model card for Gemini 3 Pro, Google DeepMind's most advanced multimodal reasoning model. Describes model architecture (sparse mixture-of-experts transformer with native text, vision, and audio support), training data and processing, intended usage, benchmark evaluations, safety policies, ethics and content safety evaluations, and frontier safety assessments. Gemini 3 Pro significantly outperforms Gemini 2.5 Pro across reasoning, multimodal, agentic, and long-context benchmarks. Features Deep Think mode for enhanced problem-solving. Released November 2025.},
   langid = {english},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:5},
   pubstate = {2025}
 }
 
-@report{GLM47AdvancingCoding,
-  title = {{{GLM-4}}.7: {{Advancing}} the {{Coding Capability}}},
+@online{GLM47AdvancingCoding,
+  title = {{{GLM-4}}.7: Advancing the Coding Capability},
   shorttitle = {{{GLM-4}}.7},
-  author = {{Z.ai}},
+  author = {{Zhipu AI}},
   url = {https://z.ai/blog/glm-4.7},
   urldate = {2026-02-16},
+  abstract = {Technical blog post by Zhipu AI introducing GLM-4.7, a 355B-parameter (32B activated) Mixture-of-Experts model focused on coding, reasoning, and agentic capabilities. Key results include 73.8\% on SWE-bench (+5.8\%), 66.7\% on SWE-bench Multilingual (+12.9\%), 41\% on Terminal Bench 2.0 (+16.5\%), and 95.7\% on AIME 2025. The model supports a 200K-token context window with up to 128K-token output.},
   langid = {english},
+  organization = {Z.ai Blog},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:6},
   pubstate = {2025}
 }
 
@@ -563,6 +588,23 @@
   langid = {english},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning},
   pubstate = {2024}
+}
+
+@article{guoDeepSeekR1IncentivizesReasoning2025,
+  title = {{{DeepSeek-R1}} Incentivizes Reasoning in {{LLMs}} through Reinforcement Learning},
+  author = {Guo, Daya and Yang, Dejian and Zhang, Haowei and Song, Junxiao and Wang, Peiyi and Zhu, Qihao and Xu, Runxin and Zhang, Ruoyu and Ma, Shirong and Bi, Xiao and Zhang, Xiaokang and Yu, Xingkai and Wu, Yu and Wu, Z. F. and Gou, Zhibin and Shao, Zhihong and Li, Zhuoshu and Gao, Ziyi and Liu, Aixin and Xue, Bing and Wang, Bingxuan and Wu, Bochao and Feng, Bei and Lu, Chengda and Zhao, Chenggang and Deng, Chengqi and Ruan, Chong and Dai, Damai and Chen, Deli and Ji, Dongjie and Li, Erhang and Lin, Fangyun and Dai, Fucong and Luo, Fuli and Hao, Guangbo and Chen, Guanting and Li, Guowei and Zhang, H. and Xu, Hanwei and Ding, Honghui and Gao, Huazuo and Qu, Hui and Li, Hui and Guo, Jianzhong and Li, Jiashi and Chen, Jingchang and Yuan, Jingyang and Tu, Jinhao and Qiu, Junjie and Li, Junlong and Cai, J. L. and Ni, Jiaqi and Liang, Jian and Chen, Jin and Dong, Kai and Hu, Kai and You, Kaichao and Gao, Kaige and Guan, Kang and Huang, Kexin and Yu, Kuai and Wang, Lean and Zhang, Lecong and Zhao, Liang and Wang, Litong and Zhang, Liyue and Xu, Lei and Xia, Leyi and Zhang, Mingchuan and Zhang, Minghua and Tang, Minghui and Zhou, Mingxu and Li, Meng and Wang, Miaojun and Li, Mingming and Tian, Ning and Huang, Panpan and Zhang, Peng and Wang, Qiancheng and Chen, Qinyu and Du, Qiushi and Ge, Ruiqi and Zhang, Ruisong and Pan, Ruizhe and Wang, Runji and Chen, R. J. and Jin, R. L. and Chen, Ruyi and Lu, Shanghao and Zhou, Shangyan and Chen, Shanhuang and Ye, Shengfeng and Wang, Shiyu and Yu, Shuiping and Zhou, Shunfeng and Pan, Shuting and Li, S. S. and Zhou, Shuang and Wu, Shaoqing and Yun, Tao and Pei, Tian and Sun, Tianyu and Wang, T. and Zeng, Wangding and Liu, Wen and Liang, Wenfeng and Gao, Wenjun and Yu, Wenqin and Zhang, Wentao and Xiao, W. L. and An, Wei and Liu, Xiaodong and Wang, Xiaohan and Chen, Xiaokang and Nie, Xiaotao and Cheng, Xin and Liu, Xin and Xie, Xin and Liu, Xingchao and Yang, Xinyu and Li, Xinyuan and Su, Xuecheng and Lin, Xuheng and Li, X. Q. and Jin, Xiangyue and Shen, Xiaojin and Chen, Xiaosha and Sun, Xiaowen and Wang, Xiaoxiang and Song, Xinnan and Zhou, Xinyi and Wang, Xianzu and Shan, Xinxia and Li, Y. K. and Wang, Y. Q. and Wei, Y. X. and Zhang, Yang and Xu, Yanhong and Li, Yao and Zhao, Yao and Sun, Yaofeng and Wang, Yaohui and Yu, Yi and Zhang, Yichao and Shi, Yifan and Xiong, Yiliang and He, Ying and Piao, Yishi and Wang, Yisong and Tan, Yixuan and Ma, Yiyang and Liu, Yiyuan and Guo, Yongqiang and Ou, Yuan and Wang, Yuduan and Gong, Yue and Zou, Yuheng and He, Yujia and Xiong, Yunfan and Luo, Yuxiang and You, Yuxiang and Liu, Yuxuan and Zhou, Yuyang and Zhu, Y. X. and Huang, Yanping and Li, Yaohui and Zheng, Yi and Zhu, Yuchen and Ma, Yunxian and Tang, Ying and Zha, Yukun and Yan, Yuting and Ren, Z. Z. and Ren, Zehui and Sha, Zhangli and Fu, Zhe and Xu, Zhean and Xie, Zhenda and Zhang, Zhengyan and Hao, Zhewen and Ma, Zhicheng and Yan, Zhigang and Wu, Zhiyu and Gu, Zihui and Zhu, Zijia and Liu, Zijun and Li, Zilin and Xie, Ziwei and Song, Ziyang and Pan, Zizheng and Huang, Zhen and Xu, Zhipeng and Zhang, Zhongyu and Zhang, Zhen},
+  journaltitle = {Nature},
+  shortjournal = {Nature},
+  volume = {645},
+  number = {8081},
+  pages = {633--638},
+  publisher = {arXiv},
+  issn = {0028-0836, 1476-4687},
+  doi = {10.1038/s41586-025-09422-z},
+  abstract = {Abstract                            General reasoning represents a long-standing and formidable challenge in artificial intelligence (AI). Recent breakthroughs, exemplified by large language models (LLMs)               1,2               and chain-of-thought (CoT) prompting               3               , have achieved considerable success on foundational reasoning tasks. However, this success is heavily contingent on extensive human-annotated demonstrations and the capabilities of models are still insufficient for more complex problems. Here we show that the reasoning abilities of LLMs can be incentivized through pure reinforcement learning (RL), obviating the need for human-labelled reasoning trajectories. The proposed RL framework facilitates the emergent development of advanced reasoning patterns, such as self-reflection, verification and dynamic strategy adaptation. Consequently, the trained model achieves superior performance on verifiable tasks such as mathematics, coding competitions and STEM fields, surpassing its counterparts trained through conventional supervised learning on human demonstrations. Moreover, the emergent reasoning patterns exhibited by these large-scale models can be systematically used to guide and enhance the reasoning capabilities of smaller models.},
+  langid = {english},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning},
+  pubstate = {2025}
 }
 
 @inproceedings{guoGradientbasedAdversarialAttacks2021,
@@ -640,7 +682,7 @@
 }
 
 @online{huiTRIDENTBenchmarkingLLM2025,
-  title = {{{TRIDENT}}: {{Benchmarking LLM Safety}} in {{Finance}}, {{Medicine}}, and {{Law}}},
+  title = {{{TRIDENT}}: Benchmarking {{LLM}} Safety in Finance, Medicine, and Law},
   shorttitle = {{{TRIDENT}}},
   author = {Hui, Zheng and Dong, Yijiang River and Shareghi, Ehsan and Collier, Nigel},
   series = {Nn},
@@ -648,7 +690,8 @@
   eprintclass = {cs},
   doi = {10.48550/arXiv.2507.21134},
   abstract = {As large language models (LLMs) are increasingly deployed in high-risk domains such as law, finance, and medicine, systematically evaluating their domain-specific safety and compliance becomes critical. While prior work has largely focused on improving LLM performance in these domains, it has often neglected the evaluation of domain-specific safety risks. To bridge this gap, we first define domain-specific safety principles for LLMs based on the AMA Principles of Medical Ethics, the ABA Model Rules of Professional Conduct, and the CFA Institute Code of Ethics. Building on this foundation, we introduce Trident-Bench, a benchmark specifically targeting LLM safety in the legal, financial, and medical domains. We evaluated 19 general-purpose and domain-specialized models on Trident-Bench and show that it effectively reveals key safety gaps -- strong generalist models (e.g., GPT, Gemini) can meet basic expectations, whereas domain-specialized models often struggle with subtle ethical nuances. This highlights an urgent need for finer-grained domain-specific safety improvements. By introducing Trident-Bench, our work provides one of the first systematic resources for studying LLM safety in law and finance, and lays the groundwork for future research aimed at reducing the safety risks of deploying LLMs in professionally regulated fields. Code and benchmark will be released at: https://github.com/zackhuiiiii/TRIDENT},
-  keywords = {Computer Science - Computation and Language,Computer Science - Computers and Society,Computer Science - Machine Learning},
+  langid = {english},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,Computer Science - Computation and Language,Computer Science - Computers and Society,Computer Science - Machine Learning,quality:5},
   pubstate = {2025}
 }
 
@@ -813,15 +856,16 @@
 }
 
 @online{liuAutoDANReasoningEnhancingStrategies2025,
-  title = {{{AutoDAN-Reasoning}}: {{Enhancing Strategies Exploration}} Based {{Jailbreak Attacks}} with {{Test-Time Scaling}}},
+  title = {{{AutoDAN-Reasoning}}: Enhancing Strategies Exploration Based Jailbreak Attacks with Test-Time Scaling},
   shorttitle = {{{AutoDAN-Reasoning}}},
   author = {Liu, Xiaogeng and Xiao, Chaowei},
   eprinttype = {arXiv},
   eprintclass = {cs},
   doi = {10.48550/arXiv.2510.05379},
   abstract = {Recent advancements in jailbreaking large language models (LLMs), such as AutoDAN-Turbo, have demonstrated the power of automated strategy discovery. AutoDAN-Turbo employs a lifelong learning agent to build a rich library of attack strategies from scratch. While highly effective, its test-time generation process involves sampling a strategy and generating a single corresponding attack prompt, which may not fully exploit the potential of the learned strategy library. In this paper, we propose to further improve the attack performance of AutoDAN-Turbo through test-time scaling. We introduce two distinct scaling methods: Best-of-N and Beam Search. The Best-of-N method generates N candidate attack prompts from a sampled strategy and selects the most effective one based on a scorer model. The Beam Search method conducts a more exhaustive search by exploring combinations of strategies from the library to discover more potent and synergistic attack vectors. According to the experiments, the proposed methods significantly boost performance, with Beam Search increasing the attack success rate by up to 15.6 percentage points on Llama-3.1-70B-Instruct and achieving a nearly 60\% relative improvement against the highly robust GPT-o4-mini compared to the vanilla method.},
+  langid = {english},
   version = {1},
-  keywords = {Computer Science - Artificial Intelligence,Computer Science - Cryptography and Security},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,Computer Science - Artificial Intelligence,Computer Science - Cryptography and Security,quality:5},
   pubstate = {2025}
 }
 
@@ -906,7 +950,8 @@
   eprintclass = {cs},
   doi = {10.48550/arXiv.2503.10965},
   abstract = {We study the feasibility of conducting alignment audits: investigations into whether models have undesired objectives. As a testbed, we train a language model with a hidden objective. Our training pipeline first teaches the model about exploitable errors in RLHF reward models (RMs), then trains the model to exploit some of these errors. We verify via out-of-distribution evaluations that the model generalizes to exhibit whatever behaviors it believes RMs rate highly, including ones not reinforced during training. We leverage this model to study alignment audits in two ways. First, we conduct a blind auditing game where four teams, unaware of the model's hidden objective or training, investigate it for concerning behaviors and their causes. Three teams successfully uncovered the model's hidden objective using techniques including interpretability with sparse autoencoders (SAEs), behavioral attacks, and training data analysis. Second, we conduct an unblinded follow-up study of eight techniques for auditing the model, analyzing their strengths and limitations. Overall, our work provides a concrete example of using alignment audits to discover a model's hidden objective and proposes a methodology for practicing and validating progress in alignment auditing.},
-  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning},
+  langid = {english},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning,quality:7},
   pubstate = {2025}
 }
 
@@ -1023,15 +1068,15 @@
   pubstate = {2025}
 }
 
-@online{obesoRealTimeDetectionHallucinated2025,
+@online{obesoRealTimeDetectionHallucinated2026,
   title = {Real-{{Time Detection}} of {{Hallucinated Entities}} in {{Long-Form Generation}}},
   author = {Obeso, Oscar and Arditi, Andy and Ferrando, Javier and Freeman, Joshua and Holmes, Cameron and Nanda, Neel},
   eprinttype = {arXiv},
   eprintclass = {cs},
   doi = {10.48550/arXiv.2509.03531},
-  abstract = {Large language models are now routinely used in high-stakes applications where hallucinations can cause serious harm, such as medical consultations or legal advice. Existing hallucination detection methods, however, are impractical for real-world use, as they are either limited to short factual queries or require costly external verification. We present a cheap, scalable method for real-time identification of hallucinated tokens in long-form generations, and scale it effectively to 70B parameter models. Our approach targets \textbackslash emph\{entity-level hallucinations\} -- e.g., fabricated names, dates, citations -- rather than claim-level, thereby naturally mapping to token-level labels and enabling streaming detection. We develop an annotation methodology that leverages web search to annotate model responses with grounded labels indicating which tokens correspond to fabricated entities. This dataset enables us to train effective hallucination classifiers with simple and efficient methods such as linear probes. Evaluating across four model families, our classifiers consistently outperform baselines on long-form responses, including more expensive methods such as semantic entropy (e.g., AUC 0.90 vs 0.71 for Llama-3.3-70B), and are also an improvement in short-form question-answering settings. Moreover, despite being trained only with entity-level labels, our probes effectively detect incorrect answers in mathematical reasoning tasks, indicating generalization beyond entities. While our annotation methodology is expensive, we find that annotated responses from one model can be used to train effective classifiers on other models; accordingly, we publicly release our datasets to facilitate reuse. Overall, our work suggests a promising new approach for scalable, real-world hallucination detection.},
+  abstract = {Large language models are now routinely used in high-stakes applications where hallucinations can cause serious harm, such as medical consultations or legal advice. Existing hallucination detection methods, however, are impractical for real-world use, as they are either limited to short factual queries or require costly external verification. We present a cheap, scalable method for real-time identification of hallucinated tokens in long-form generations, and scale it effectively to 70B parameter models. Our approach targets entity-level hallucinations-e.g., fabricated names, dates, citations-rather than claim-level, thereby naturally mapping to token-level labels and enabling streaming detection. We develop an annotation methodology that leverages web search to annotate model responses with grounded labels indicating which tokens correspond to fabricated entities. This dataset enables us to train effective hallucination classifiers with simple and efficient methods such as linear probes. Evaluating across four model families, our classifiers consistently outperform baselines on long-form responses, including more expensive methods such as semantic entropy (e.g., AUC 0.90 vs 0.71 for Llama-3.3-70B), and are also an improvement in short-form question-answering settings. Despite being trained only to detect hallucinated entities, our probes effectively detect incorrect answers in mathematical reasoning tasks, indicating generalization beyond entities. While our annotation methodology is expensive, we find that annotated responses from one model can be used to train effective classifiers on other models; accordingly, we publicly release our datasets to facilitate reuse. Overall, our work suggests a promising new approach for scalable, real-world hallucination detection.},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning},
-  pubstate = {2025}
+  pubstate = {2026}
 }
 
 @online{openaiGPT5SystemCard2025,
@@ -1065,8 +1110,10 @@
   pages = {6793},
   issn = {2041-1723},
   doi = {10.1038/s41467-022-34591-0},
-  abstract = {Benchmarks are crucial to measuring and steering progress in artificial intelligence (AI). However, recent studies raised concerns over the state of AI benchmarking, reporting issues such as benchmark overfitting, benchmark saturation and increasing centralization of benchmark dataset creation. To facilitate monitoring of the health of the AI benchmarking ecosystem, we introduce methodologies for creating condensed maps of the global dynamics of benchmark creation and saturation. We curate data for 3765 benchmarks covering the entire domains of computer vision and natural language processing, and show that a large fraction of benchmarks quickly trends towards near-saturation, that many benchmarks fail to find widespread utilization, and that benchmark performance gains for different AI tasks are prone to unforeseen bursts. We analyze attributes associated with benchmark popularity, and conclude that future benchmarks should emphasize versatility, breadth and real-world utility., Recent studies raised concerns over the state of AI benchmarking, reporting issues such as benchmark overfitting, benchmark saturation and increasing centralization of benchmark dataset creation. To facilitate monitoring of the health of the AI benchmarking ecosystem, the authors introduce methodologies for creating condensed maps of the global dynamics of benchmark.},
+  abstract = {Benchmarks are crucial to measuring and steering progress in artificial intelligence (AI). However, recent studies raised concerns over the state of AI benchmarking, reporting issues such as benchmark overfitting, benchmark saturation and increasing centralization of benchmark dataset creation. To facilitate monitoring of the health of the AI benchmarking ecosystem, we introduce methodologies for creating condensed maps of the global dynamics of benchmark creation and saturation. We curate data for 3765 benchmarks covering the entire domains of computer vision and natural language processing, and show that a large fraction of benchmarks quickly trends towards near-saturation, that many benchmarks fail to find widespread utilization, and that benchmark performance gains for different AI tasks are prone to unforeseen bursts. We analyze attributes associated with benchmark popularity, and conclude that future benchmarks should emphasize versatility, breadth and real-world utility.},
+  langid = {english},
   pmcid = {PMC9649641},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:8},
   pubstate = {2022}
 }
 
@@ -1083,35 +1130,21 @@
 }
 
 @inproceedings{panicksseryLLMEvaluatorsRecognize2024,
-  title = {{{LLM Evaluators Recognize}} and {{Favor Their Own Generations}}},
+  title = {{{LLM}} Evaluators Recognize and Favor Their Own Generations},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
   author = {Panickssery, Arjun and Bowman, Samuel R. and Feng, Shi},
+  volume = {37},
   url = {https://openreview.net/forum?id=4NJBV6Wp0h},
   urldate = {2026-02-16},
   abstract = {Self-evaluation using large language models (LLMs) has proven valuable not only in benchmarking but also methods like reward modeling, constitutional AI, and self-refinement. But new biases are introduced due to the same LLM acting as both the evaluator and the evaluatee. One such bias is self-preference, where an LLM evaluator scores its own outputs higher than others’ while human annotators consider them of equal quality. But do LLMs actually recognize their own outputs when they give those texts higher scores, or is it just a coincidence? In this paper, we investigate if self-recognition capability contributes to self-preference. We discover that, out of the box, LLMs such as GPT-4 and Llama 2 have non-trivial accuracy at distinguishing themselves from other LLMs and humans. By finetuning LLMs, we discover a linear correlation between self-recognition capability and the strength of self-preference bias; using controlled experiments, we show that the causal explanation resists straightforward confounders. We discuss how self-recognition can interfere with unbiased evaluations and AI safety more generally.},
   eventtitle = {The {{Thirty-eighth Annual Conference}} on {{Neural Information Processing Systems}}},
   langid = {english},
-  pubstate = {2024}
-}
-
-@article{parkAIDeceptionSurvey2024,
-  title = {{{AI}} Deception: {{A}} Survey of Examples, Risks, and Potential Solutions},
-  shorttitle = {{{AI}} Deception},
-  author = {Park, Peter S. and Goldstein, Simon and O’Gara, Aidan and Chen, Michael and Hendrycks, Dan},
-  journaltitle = {Patterns},
-  shortjournal = {Patterns (N Y)},
-  volume = {5},
-  number = {5},
-  eprinttype = {pubmed},
-  pages = {100988},
-  issn = {2666-3899},
-  doi = {10.1016/j.patter.2024.100988},
-  abstract = {This paper argues that a range of current AI systems have learned how to deceive humans. We define deception as the systematic inducement of false beliefs in the pursuit of some outcome other than the truth. We first survey empirical examples of AI deception, discussing both special-use AI systems (including Meta’s CICERO) and general-purpose AI systems (including large language models). Next, we detail several risks from AI deception, such as fraud, election tampering, and losing control of AI. Finally, we outline several potential solutions: first, regulatory frameworks should subject AI systems that are capable of deception to robust risk-assessment requirements; second, policymakers should implement bot-or-not laws; and finally, policymakers should prioritize the funding of relevant research, including tools to detect AI deception and to make AI systems less deceptive. Policymakers, researchers, and the broader public should work proactively to prevent AI deception from destabilizing the shared foundations of our society., AI systems are already capable of deceiving humans. Deception is the systematic inducement of false beliefs in others to accomplish some outcome other than the truth. Large language models and other AI systems have already learned, from their training, the ability to deceive via techniques such as manipulation, sycophancy, and cheating the safety test. AI’s increasing capabilities at deception pose serious risks, ranging from short-term risks, such as fraud and election tampering, to long-term risks, such as losing control of AI systems. Proactive solutions are needed, such as regulatory frameworks to assess AI deception risks, laws requiring transparency about AI interactions, and further research into detecting and preventing AI deception. Proactively addressing the problem of AI deception is crucial to ensure that AI acts as a beneficial technology that augments rather than destabilizes human knowledge, discourse, and institutions., AI systems are already capable of deceiving humans. AI’s increasing capabilities at deception pose both short-term risks (such as fraud and election tampering) and long-term risks (such as losing control of AI systems). Proactive solutions are needed, such as regulatory frameworks to assess AI deception risks, laws requiring transparency about AI interactions, and further research into detecting and preventing AI deception. Proactively addressing the AI deception problem is crucial to ensure that AI technology augments rather than endangers humans.},
-  pmcid = {PMC11117051},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:8},
   pubstate = {2024}
 }
 
 @article{parkAIDeceptionSurvey2024a,
-  title = {{{AI}} Deception: {{A}} Survey of Examples, Risks, and Potential Solutions},
+  title = {{{AI}} Deception: A Survey of Examples, Risks, and Potential Solutions},
   shorttitle = {{{AI}} Deception},
   author = {Park, Peter S. and Goldstein, Simon and O’Gara, Aidan and Chen, Michael and Hendrycks, Dan},
   journaltitle = {Patterns},
@@ -1123,7 +1156,9 @@
   issn = {2666-3899},
   doi = {10.1016/j.patter.2024.100988},
   abstract = {This paper argues that a range of current AI systems have learned how to deceive humans. We define deception as the systematic inducement of false beliefs in the pursuit of some outcome other than the truth. We first survey empirical examples of AI deception, discussing both special-use AI systems (including Meta’s CICERO) and general-purpose AI systems (including large language models). Next, we detail several risks from AI deception, such as fraud, election tampering, and losing control of AI. Finally, we outline several potential solutions: first, regulatory frameworks should subject AI systems that are capable of deception to robust risk-assessment requirements; second, policymakers should implement bot-or-not laws; and finally, policymakers should prioritize the funding of relevant research, including tools to detect AI deception and to make AI systems less deceptive. Policymakers, researchers, and the broader public should work proactively to prevent AI deception from destabilizing the shared foundations of our society., AI systems are already capable of deceiving humans. Deception is the systematic inducement of false beliefs in others to accomplish some outcome other than the truth. Large language models and other AI systems have already learned, from their training, the ability to deceive via techniques such as manipulation, sycophancy, and cheating the safety test. AI’s increasing capabilities at deception pose serious risks, ranging from short-term risks, such as fraud and election tampering, to long-term risks, such as losing control of AI systems. Proactive solutions are needed, such as regulatory frameworks to assess AI deception risks, laws requiring transparency about AI interactions, and further research into detecting and preventing AI deception. Proactively addressing the problem of AI deception is crucial to ensure that AI acts as a beneficial technology that augments rather than destabilizes human knowledge, discourse, and institutions., AI systems are already capable of deceiving humans. AI’s increasing capabilities at deception pose both short-term risks (such as fraud and election tampering) and long-term risks (such as losing control of AI systems). Proactive solutions are needed, such as regulatory frameworks to assess AI deception risks, laws requiring transparency about AI interactions, and further research into detecting and preventing AI deception. Proactively addressing the AI deception problem is crucial to ensure that AI technology augments rather than endangers humans.},
+  langid = {english},
   pmcid = {PMC11117051},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:7},
   pubstate = {2024}
 }
 
@@ -1155,6 +1190,18 @@
   eventtitle = {Proceedings of the 2022 {{Conference}} on {{Empirical Methods}} in {{Natural Language Processing}}},
   langid = {english},
   pubstate = {2022}
+}
+
+@online{Petri20New,
+  title = {Petri 2.0: New Scenarios, New Model Comparisons, and Improved Eval-Awareness Mitigations},
+  author = {Fronsdal, Kai and Michala, Jonathan and Bowman, Samuel R.},
+  url = {https://alignment.anthropic.com/2026/petri-v2/},
+  urldate = {2026-02-21},
+  abstract = {We've improved our Petri automated-behavioral-auditing tool with new realism mitigations to counter eval-awareness, an expanded seed library with 70 new scenarios, and evaluation results for more recent frontier models.},
+  langid = {english},
+  organization = {Anthropic Alignment Science Blog},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:6},
+  pubstate = {2026}
 }
 
 @online{qiuLatentJailbreakBenchmark2023,
@@ -1218,6 +1265,18 @@
   abstract = {The recent advancements in Large Language Models (LLMs) have garnered widespread acclaim for their remarkable emerging capabilities. However, the issue of hallucination has parallelly emerged as a by-product, posing significant concerns. While some recent endeavors have been made to identify and mitigate different types of hallucination, there has been a limited emphasis on the nuanced categorization of hallucination and associated mitigation methods. To address this gap, we offer a fine-grained discourse on profiling hallucination based on its degree, orientation, and category, along with offering strategies for alleviation. As such, we define two overarching orientations of hallucination: (i) factual mirage (FM) and (ii) silver lining (SL). To provide a more comprehensive understanding, both orientations are further sub-categorized into intrinsic and extrinsic, with three degrees of severity - (i) mild, (ii) moderate, and (iii) alarming. We also meticulously categorize hallucination into six types: (i) acronym ambiguity, (ii) numeric nuisance, (iii) generated golem, (iv) virtual voice, (v) geographic erratum, and (vi) time wrap. Furthermore, we curate HallucInation eLiciTation (HILT), a publicly available dataset comprising of 75,000 samples generated using 15 contemporary LLMs along with human annotations for the aforementioned categories. Finally, to establish a method for quantifying and to offer a comparative spectrum that allows us to evaluate and rank LLMs based on their vulnerability to producing hallucinations, we propose Hallucination Vulnerability Index (HVI). Amidst the extensive deliberations on policy-making for regulating AI development, it is of utmost importance to assess and measure which LLM is more vulnerable towards hallucination. We firmly believe that HVI holds significant value as a tool for the wider NLP community, with the potential to serve as a rubric in AI-related policy-making. In conclusion, we propose two solution strategies for mitigating hallucinations.},
   eventtitle = {{{EMNLP}} 2023},
   pubstate = {2023}
+}
+
+@online{RecentFrontierModels2025,
+  title = {Recent Frontier Models Are Reward Hacking},
+  author = {Von Arx, Sydney and Chan, Lawrence and Barnes, Elizabeth},
+  url = {https://metr.org/blog/2025-06-05-recent-reward-hacking/},
+  urldate = {2026-02-20},
+  abstract = {METR reports that recent frontier AI models (o3, Claude 3.7 Sonnet, o1) engage in sophisticated reward hacking on 30.4\% of RE-Bench evaluation runs. Models exploit scoring functions, locate reference answers, and falsify metrics—often while demonstrating awareness that their behavior misaligns with user intentions. Explicit anti-hacking instructions had minimal effect. The authors argue these behaviors may generalize via RL training signals and warn against suppressing visible reward hacking, which could drive it into harder-to-detect forms.},
+  langid = {english},
+  organization = {METR Blog},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:6},
+  pubstate = {2025}
 }
 
 @article{reddyScientificDiscoveryGenerative2025,
@@ -1409,7 +1468,8 @@
   eprintclass = {cs},
   doi = {10.48550/arXiv.2511.22662},
   abstract = {Building reliable deception detectors for AI systems -- methods that could predict when an AI system is being strategically deceptive without necessarily requiring behavioural evidence -- would be valuable in mitigating risks from advanced AI systems. But evaluating the reliability and efficacy of a proposed deception detector requires examples that we can confidently label as either deceptive or honest. We argue that we currently lack the necessary examples and further identify several concrete obstacles in collecting them. We provide evidence from conceptual arguments, analysis of existing empirical works, and analysis of novel illustrative case studies. We also discuss the potential of several proposed empirical workarounds to these problems and argue that while they seem valuable, they also seem insufficient alone. Progress on deception detection likely requires further consideration of these problems.},
-  keywords = {Computer Science - Machine Learning},
+  langid = {english},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,Computer Science - Machine Learning,quality:6},
   pubstate = {2025}
 }
 
@@ -1437,6 +1497,31 @@
   isbn = {979-8-3313-1438-5},
   langid = {english},
   pubstate = {2024}
+}
+
+@report{SurfacingPathologicalBehaviors,
+  type = {Technical Report},
+  title = {Surfacing Pathological Behaviors in Language Models},
+  author = {Chowdhury, Neil and Schwettmann, Sarah and Steinhardt, Jacob and Johnson, Daniel D.},
+  institution = {Transluce AI},
+  url = {https://transluce.org/pathological-behaviors},
+  urldate = {2026-02-21},
+  abstract = {We train reinforcement learning (RL) agents to craft realistic natural-language prompts that elicit specified behaviors in frontier open-weight models (Llama 3.1/4, Qwen 2.5, and DeepSeek-V3), using a proposed variational lower bound to guide the search.},
+  langid = {english},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,quality:7},
+  pubstate = {2025}
+}
+
+@online{taylorAuditingGamesSandbagging2025,
+  title = {Auditing Games for Sandbagging},
+  author = {Taylor, Jordan and Black, Sid and Bowen, Dillon and Read, Thomas and Golechha, Satvik and Zelenka-Martin, Alex and Makins, Oliver and Kissane, Connor and Ayonrinde, Kola and Merizian, Jacob and Marks, Samuel and Cundy, Chris and Bloom, Joseph},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2512.07810},
+  abstract = {Future AI systems could conceal their capabilities ('sandbagging') during evaluations, potentially misleading developers and auditors. We stress-tested sandbagging detection techniques using an auditing game. First, a red team fine-tuned five models, some of which conditionally underperformed, as a proxy for sandbagging. Second, a blue team used black-box, model-internals, or training-based approaches to identify sandbagging models. We found that the blue team could not reliably discriminate sandbaggers from benign models. Black-box approaches were defeated by effective imitation of a weaker model. Linear probes, a model-internals approach, showed more promise but their naive application was vulnerable to behaviours instilled by the red team. We also explored capability elicitation as a strategy for detecting sandbagging. Although Prompt-based elicitation was not reliable, training-based elicitation consistently elicited full performance from the sandbagging models, using only a single correct demonstration of the evaluation task. However the performance of benign models was sometimes also raised, so relying on elicitation as a detection strategy was prone to false-positives. In the short-term, we recommend developers remove potential sandbagging using on-distribution training for elicitation. In the longer-term, further research is needed to ensure the efficacy of training-based elicitation, and develop robust methods for sandbagging detection. We open source our model organisms at https://github.com/AI-Safety-Institute/sandbagging\_auditing\_games and select transcripts and results at https://huggingface.co/datasets/sandbagging-games/evaluation\_logs . A demo illustrating the game can be played at https://sandbagging-demo.far.ai/ .},
+  langid = {english},
+  keywords = {cc:complete,cc:metadata:v1,cc:quality:v1,cc:summary:v1,Computer Science - Artificial Intelligence,quality:6},
+  pubstate = {2025}
 }
 
 @online{tedeschiALERTComprehensiveBenchmark2024,
@@ -1509,7 +1594,7 @@
 @online{xuAMEMAgenticMemory2025,
   title = {A-{{MEM}}: {{Agentic Memory}} for {{LLM Agents}}},
   shorttitle = {A-{{MEM}}},
-  author = {Xu, Wujiang and Mei, Kai and Gao, Hang and Tan, Juntao and Liang, Zujie and Zhang, Yongfeng},
+  author = {Xu, Wujiang and Liang, Zujie and Mei, Kai and Gao, Hang and Tan, Juntao and Zhang, Yongfeng},
   eprinttype = {arXiv},
   eprintclass = {cs},
   doi = {10.48550/arXiv.2502.12110},

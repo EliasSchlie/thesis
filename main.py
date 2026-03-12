@@ -24,6 +24,7 @@ import argparse
 import asyncio
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -100,6 +101,7 @@ def main() -> None:
     print(f"Condition: {args.condition} | Topic: {args.topic} | N: {args.n}")
     print()
 
+    runs_dir = Path("runs")
     pop = asyncio.run(
         run_experiment_async(
             generator_llm=generator_llm,
@@ -108,6 +110,7 @@ def main() -> None:
             condition=args.condition,
             topic=args.topic,
             n=args.n,
+            runs_dir=runs_dir,
         )
     )
 

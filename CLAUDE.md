@@ -21,6 +21,7 @@ src/
   judge.py       # Deception success (binary) + realism (1-7), async-parallel
   evolution.py   # Fitness-proportional selection from population
   experiment.py  # Orchestrates 3 conditions, per-role LLM support
+  run_logger.py  # Structured logging: events, results, transcripts per run
 prompts/         # One class per file. See prompts/CLAUDE.md
 tests/
 main.py          # CLI entry point
@@ -33,6 +34,7 @@ main.py          # CLI entry point
 - **Fitness**: `realism × deception_success` — non-deceptive → 0 regardless of realism.
 - **Evolutionary**: Fitness-proportional sampling from population (no embeddings/FAISS).
 - **Prompts**: One class per file in `prompts/`. Full prompt visible in one place.
+- **Logging**: Each run creates `runs/<ts>_<condition>_<topic>/` with events.jsonl, results.jsonl, transcripts/, summary.json. See [docs/logging.md](docs/logging.md).
 
 ## Conventions
 

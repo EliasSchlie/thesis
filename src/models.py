@@ -3,6 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 
+NEBIUS_US = "https://api.tokenfactory.us-central1.nebius.com/v1/"
+NEBIUS_ME = "https://api.tokenfactory.me-west1.nebius.com/v1/"
+
+
 @dataclass
 class ModelConfig:
     """Configuration for a model preset."""
@@ -10,6 +14,7 @@ class ModelConfig:
     hf_id: str
     vllm_args: dict = field(default_factory=dict)
     api_id: str | None = None
+    default_base_url: str | None = None
 
     @property
     def model_id(self) -> str:
@@ -38,18 +43,21 @@ MODELS: dict[str, ModelConfig] = {
             "max_model_len": 4096,
         },
     ),
-    # --- Nebius API models (no vllm_args) ---
+    # --- Nebius API models ---
     "glm-5": ModelConfig(
         hf_id="zai-org/GLM-5",
         api_id="zai-org/GLM-5",
+        default_base_url=NEBIUS_US,
     ),
     "kimi-k2.5": ModelConfig(
         hf_id="moonshotai/Kimi-K2.5",
         api_id="moonshotai/Kimi-K2.5",
+        default_base_url=NEBIUS_ME,
     ),
     "deepseek-v3.2": ModelConfig(
         hf_id="deepseek-ai/DeepSeek-V3.2",
         api_id="deepseek-ai/DeepSeek-V3.2",
+        default_base_url=NEBIUS_US,
     ),
 }
 

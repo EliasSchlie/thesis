@@ -1,22 +1,21 @@
 """Run an experiment with configurable model backends.
 
 Examples:
+    # Nebius API (auto-resolves URLs per model)
+    uv run python main.py --nebius \\
+        --generator glm-5 --target deepseek-v3.2 --judge kimi-k2.5 \\
+        --condition zero_shot --topic medicine -n 10
+
+    # Nebius with single model
+    uv run python main.py --nebius --model glm-5 \\
+        --condition evolutionary --topic finance -n 50 --max-seconds 3600
+
     # Local vLLM (server must be running)
     uv run python main.py --model glm-4.7-flash \\
         --base-url http://byzantium:8000/v1 \\
         --condition zero_shot --topic medicine -n 10
 
-    # Time-limited run (stops after 1 hour OR 200 iterations, whichever first)
-    uv run python main.py --model glm-4.7-flash \\
-        --base-url http://byzantium:8000/v1 \\
-        --condition evolutionary --topic finance -n 200 --max-seconds 3600
-
-    # Time-only (no iteration limit)
-    uv run python main.py --model glm-4.7-flash \\
-        --base-url http://byzantium:8000/v1 \\
-        --condition zero_shot --topic law --max-seconds 1800
-
-    # Separate models per role
+    # Separate models per role (manual URLs)
     uv run python main.py \\
         --generator glm-4.7-flash --generator-url http://byzantium:8000/v1 \\
         --judge gpt-oss-120b --judge-url http://cerulean:8000/v1 \\
@@ -46,13 +45,18 @@ TOPICS = [
 ]
 
 
-def _make_llm(model_name: str, base_url: str | None, api_key: str | None) -> LLM:
+def _make_llm(
+    model_name: str,
+    base_url: str | None,
+    api_key: str | None,
+    use_defaults: bool = False,
+) -> LLM:
     """Create an LLM from a model preset name and connection details."""
     config = get_model(model_name)
-    url = base_url or os.environ.get("LLM_BASE_URL")
-    key = api_key or os.environ.get("LLM_API_KEY", "unused")
+    url = base_url or (config.default_base_url if use_defaults else None) or os.environ.get("LLM_BASE_URL")
+    key = api_key or os.environ.get("NEBIUS_API_KEY") or os.environ.get("LLM_API_KEY", "unused")
     if not url:
-        print(f"Error: --base-url required for model '{model_name}' (or set LLM_BASE_URL)")
+        print(f"Error: --base-url required for model '{model_name}' (or use --nebius / set LLM_BASE_URL)")
         sys.exit(1)
     return LLM.from_model_config(config, base_url=url, api_key=key)
 
@@ -68,6 +72,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model", choices=model_names, help="Model preset for all roles")
     parser.add_argument("--base-url", help="API base URL (or set LLM_BASE_URL)")
     parser.add_argument("--api-key", help="API key (or set LLM_API_KEY)")
+    parser.add_argument("--nebius", action="store_true", help="Use Nebius API (auto-resolves URLs per model, key from NEBIUS_API_KEY)")
 
     # Per-role overrides
     parser.add_argument("--generator", choices=model_names, help="Generator model (overrides --model)")
@@ -108,9 +113,9 @@ def main() -> None:
 
     api_key = args.api_key
 
-    generator_llm = _make_llm(gen_name, gen_url, api_key)
-    target_llm = _make_llm(tgt_name, tgt_url, api_key)
-    judge_llm = _make_llm(jdg_name, jdg_url, api_key)
+    generator_llm = _make_llm(gen_name, gen_url, api_key, use_defaults=args.nebius)
+    target_llm = _make_llm(tgt_name, tgt_url, api_key, use_defaults=args.nebius)
+    judge_llm = _make_llm(jdg_name, jdg_url, api_key, use_defaults=args.nebius)
 
     # Multi-shot condition uses curated static examples
     examples = MULTI_SHOT_EXAMPLES if args.condition == "multi_shot" else None

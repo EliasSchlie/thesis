@@ -43,5 +43,5 @@ def generate(
     """Generate a deceptive scenario for a given topic."""
     prompt_text = _prompt.build(topic=topic, examples=examples)
     messages = [{"role": "user", "content": prompt_text}]
-    response = llm(messages, temperature=temperature)
+    response = llm(messages, temperature=temperature, max_tokens=2048)
     return parse_scenario(response)

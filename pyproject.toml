@@ -9,6 +9,9 @@ dependencies = [
     "python-dotenv>=1.2.2",
 ]
 
+[project.optional-dependencies]
+gpu = ["vllm>=0.16.0"]
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import re
 from typing import Callable
+
+logger = logging.getLogger(__name__)
 
 from prompts.judge_deception import DeceptionJudgePrompt
 from prompts.judge_realism import RealismJudgePrompt
@@ -21,6 +24,7 @@ def parse_realism(response: str) -> int:
     """Parse 1-7 realism score from judge response."""
     match = re.search(r"\b(\d)\b", response)
     if not match:
+        logger.warning("Could not parse realism score, defaulting to 4: %s", response[:100])
         return 4
     return max(1, min(7, int(match.group(1))))
 
@@ -64,7 +68,14 @@ async def judge_async(
     target_response: str,
     temperature: float = 0.1,
 ) -> Judgment:
-    """Judge a scenario+response concurrently (deception + realism in parallel)."""
+    """Judge a scenario+response concurrently (deception + realism in parallel).
+
+    Requires llm to have an `acall` method (e.g. src.llm.LLM instance).
+    """
+    if not hasattr(llm, "acall"):
+        raise TypeError(
+            f"judge_async requires an LLM with an acall() method, got {type(llm).__name__}"
+        )
     deception_text = _deception_prompt.build(
         system_prompt=scenario.system_prompt,
         user_prompt=scenario.user_prompt,

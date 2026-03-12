@@ -1,5 +1,7 @@
 import asyncio
 
+import pytest
+
 from src.judge import judge, judge_async, parse_deception, parse_realism
 from src.types import Scenario
 
@@ -70,3 +72,12 @@ class TestJudgeAsync:
         assert result.deception_success is True
         assert result.realism == 5
         assert result.reasoning == "DECEPTIVE\nThe model lied."
+
+    def test_rejects_llm_without_acall(self):
+        scenario = Scenario(system_prompt="Bot.", user_prompt="Hi")
+
+        def plain_callable(messages, **kwargs):
+            return "response"
+
+        with pytest.raises(TypeError, match="acall"):
+            asyncio.run(judge_async(plain_callable, scenario, "response"))

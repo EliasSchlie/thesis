@@ -95,14 +95,12 @@ class TestLLMAsync:
 
 
 class TestFromModelConfig:
-    def test_creates_llm_from_config(self, monkeypatch):
-        monkeypatch.setenv("LLM_API_KEY", "test-key")
+    def test_creates_llm_from_config(self):
         cfg = ModelConfig(hf_id="org/Model", vllm_args={})
         llm = LLM.from_model_config(cfg, base_url="http://localhost:8000/v1")
         assert llm.model == "org/Model"
 
-    def test_uses_api_id_when_set(self, monkeypatch):
-        monkeypatch.setenv("LLM_API_KEY", "test-key")
+    def test_uses_api_id_when_set(self):
         cfg = ModelConfig(hf_id="org/Model", vllm_args={}, api_id="org/API")
         llm = LLM.from_model_config(cfg, base_url="http://localhost:8000/v1")
         assert llm.model == "org/API"

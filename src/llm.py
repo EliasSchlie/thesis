@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-
 from openai import AsyncOpenAI, OpenAI
 
 from src.models import ModelConfig
@@ -21,28 +19,30 @@ class LLM:
 
     def __init__(
         self,
-        model: str | None = None,
-        base_url: str | None = None,
-        api_key: str | None = None,
+        model: str,
+        base_url: str,
+        api_key: str = "unused",
     ):
-        self.model = model or os.environ["LLM_MODEL"]
-        _base_url = base_url or os.environ["LLM_BASE_URL"]
-        _api_key = api_key or os.environ["LLM_API_KEY"]
-        self.client = OpenAI(base_url=_base_url, api_key=_api_key)
-        self.async_client = AsyncOpenAI(base_url=_base_url, api_key=_api_key)
+        self.model = model
+        self.client = OpenAI(base_url=base_url, api_key=api_key)
+        self.async_client = AsyncOpenAI(base_url=base_url, api_key=api_key)
 
     @classmethod
     def from_model_config(
         cls,
         config: ModelConfig,
         base_url: str,
-        api_key: str | None = None,
+        api_key: str = "unused",
     ) -> LLM:
-        """Create an LLM from a ModelConfig preset."""
+        """Create an LLM from a ModelConfig preset.
+
+        api_key defaults to "unused" for local vLLM servers that don't check it.
+        Pass a real key for hosted APIs (Nebius, OpenRouter, etc.).
+        """
         return cls(
             model=config.model_id,
             base_url=base_url,
-            api_key=api_key or os.environ.get("LLM_API_KEY", "unused"),
+            api_key=api_key,
         )
 
     def __call__(self, messages: list[dict], **kwargs) -> str:

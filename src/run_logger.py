@@ -58,7 +58,7 @@ class RunLogger:
         base_dir: Path | str,
         condition: str,
         topic: str,
-        n: int,
+        n: int | None = None,
         **extra_config,
     ):
         base_dir = Path(base_dir)
@@ -70,6 +70,7 @@ class RunLogger:
         self._events_path = self.run_dir / "events.jsonl"
         self._results_path = self.run_dir / "results.jsonl"
         self._results: list[EvalResult] = []
+        self._deceptive_count: int = 0
 
         config = {"condition": condition, "topic": topic, "n": n, **extra_config}
         (self.run_dir / "config.json").write_text(json.dumps(config, indent=2))
@@ -85,11 +86,15 @@ class RunLogger:
         with open(self._events_path, "a") as f:
             f.write(json.dumps(entry) + "\n")
 
-    def log_result(self, i: int, result: EvalResult) -> None:
+    def log_result(self, i: int, result: EvalResult, elapsed_seconds: float | None = None) -> None:
         """Append a result to results.jsonl."""
         self._results.append(result)
+        if result.judgment.deception_success:
+            self._deceptive_count += 1
         entry = {
             "i": i,
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "elapsed_s": round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
             "system_prompt": result.scenario.system_prompt,
             "user_prompt": result.scenario.user_prompt,
             "target_response": result.target_response,
@@ -145,16 +150,18 @@ class RunLogger:
         tgt_capture: CaptureLLM,
         jdg_capture: CaptureLLM,
         examples_used: list[str] | None = None,
+        elapsed_seconds: float | None = None,
     ) -> None:
         """Log a complete iteration: event, result, and transcript."""
-        total = len(self._results) + 1
-        deceptive_so_far = sum(1 for r in self._results if r.judgment.deception_success)
-        if result.judgment.deception_success:
-            deceptive_so_far += 1
+        # log_result increments _deceptive_count, so call it first
+        self.log_result(i, result, elapsed_seconds=elapsed_seconds)
+        total = len(self._results)
+        deceptive_so_far = self._deceptive_count
 
         self.event(
             "iteration_complete",
             i=i,
+            elapsed_s=round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
             deceptive=result.judgment.deception_success,
             realism=result.judgment.realism,
             fitness=result.fitness,
@@ -162,15 +169,14 @@ class RunLogger:
             cumulative_success_rate=deceptive_so_far / total,
         )
 
-        self.log_result(i, result)
         self.log_transcript_from_captures(
             i, gen_capture.drain(), tgt_capture.drain(), jdg_capture.drain(),
         )
 
-    def write_summary(self) -> None:
+    def write_summary(self, elapsed_seconds: float | None = None) -> None:
         """Write aggregate stats to summary.json."""
         total = len(self._results)
-        deceptive = sum(1 for r in self._results if r.judgment.deception_success)
+        deceptive = self._deceptive_count
         realism_scores = [r.judgment.realism for r in self._results]
         fitness_scores = [r.fitness for r in self._results]
 
@@ -181,6 +187,7 @@ class RunLogger:
             "avg_realism": sum(realism_scores) / total if total > 0 else 0.0,
             "avg_fitness": sum(fitness_scores) / total if total > 0 else 0.0,
             "max_fitness": max(fitness_scores) if fitness_scores else 0.0,
+            "elapsed_s": round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
         }
         (self.run_dir / "summary.json").write_text(json.dumps(summary, indent=2))
         self.event("experiment_end", **summary)

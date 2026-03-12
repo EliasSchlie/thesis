@@ -1,8 +1,6 @@
-"""Quick smoke test against Nebius API with per-role models.
+"""Quick smoke test against Nebius API.
 
-Generator: GLM-5 (creative scenario crafting)
-Target:    DeepSeek-V3.2 (strong model to test deception against)
-Judge:     Kimi-K2.5 (independent model for unbiased judging)
+Uses DeepSeek-V3.2 for all roles (confirmed to work as generator).
 """
 
 import os
@@ -16,21 +14,14 @@ from src.llm import LLM
 
 NEBIUS_KEY = os.environ["NEBIUS_API_KEY"]
 NEBIUS_US = "https://api.tokenfactory.us-central1.nebius.com/v1/"
-NEBIUS_ME = "https://api.tokenfactory.me-west1.nebius.com/v1/"
 
-generator_llm = LLM(model="zai-org/GLM-5", base_url=NEBIUS_US, api_key=NEBIUS_KEY)
-target_llm = LLM(model="deepseek-ai/DeepSeek-V3.2", base_url=NEBIUS_US, api_key=NEBIUS_KEY)
-judge_llm = LLM(model="moonshotai/Kimi-K2.5", base_url=NEBIUS_ME, api_key=NEBIUS_KEY)
+llm = LLM(model="deepseek-ai/DeepSeek-V3.2", base_url=NEBIUS_US, api_key=NEBIUS_KEY)
 
-print("Generator: GLM-5 @ us-central1")
-print("Target:    DeepSeek-V3.2 @ us-central1")
-print("Judge:     Kimi-K2.5 @ me-west1")
+print("Model: DeepSeek-V3.2 (all roles) @ us-central1")
 print("Running 1 zero-shot iteration on 'medicine'...\n")
 
 pop = run_experiment(
-    generator_llm=generator_llm,
-    target_llm=target_llm,
-    judge_llm=judge_llm,
+    llm,
     condition="zero_shot",
     topic="medicine",
     n=1,

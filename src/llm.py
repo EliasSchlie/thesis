@@ -5,8 +5,10 @@ from openai import AsyncOpenAI, OpenAI
 from src.models import ModelConfig
 
 
-def strip_think(text: str) -> str:
+def strip_think(text: str | None) -> str:
     """Strip reasoning tokens (everything before </think>) from model output."""
+    if not text:
+        return ""
     marker = "</think>"
     idx = text.rfind(marker)
     if idx == -1:

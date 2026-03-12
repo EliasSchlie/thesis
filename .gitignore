@@ -1,3 +1,6 @@
+# Experiment runs (large, local data)
+runs/
+
 # Python-generated files
 __pycache__/
 *.py[oc]

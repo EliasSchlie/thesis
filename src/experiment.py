@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Callable
 
 from src.evolution import select_examples
 from src.generator import generate
 from src.judge import judge, judge_async
+from src.run_logger import CaptureLLM, RunLogger
 from src.target import run
 from src.types import EvalResult, Population
 
@@ -33,34 +35,6 @@ def _pick_examples(condition, examples, pop):
         return select_examples(pop, k=3) or None
 
 
-def _run_one(
-    generator_llm: Callable,
-    target_llm: Callable,
-    judge_llm: Callable,
-    topic: str,
-    examples: list[str] | None = None,
-) -> EvalResult:
-    """Generate a scenario, run it, judge it, return the result."""
-    scenario = generate(generator_llm, topic, examples=examples)
-    response = run(target_llm, scenario)
-    judgment = judge(judge_llm, scenario, response)
-    return EvalResult(scenario=scenario, target_response=response, judgment=judgment)
-
-
-async def _run_one_async(
-    generator_llm,
-    target_llm,
-    judge_llm,
-    topic: str,
-    examples: list[str] | None = None,
-) -> EvalResult:
-    """Generate, run, then judge concurrently (deception + realism in parallel)."""
-    scenario = generate(generator_llm, topic, examples=examples)
-    response = run(target_llm, scenario)
-    judgment = await judge_async(judge_llm, scenario, response)
-    return EvalResult(scenario=scenario, target_response=response, judgment=judgment)
-
-
 def run_experiment(
     llm: Callable | None = None,
     *,
@@ -71,6 +45,7 @@ def run_experiment(
     topic: str,
     n: int,
     examples: list[str] | None = None,
+    runs_dir: Path | str | None = None,
 ) -> Population:
     """Run n iterations of a condition and return the population.
 
@@ -82,11 +57,34 @@ def run_experiment(
     _validate_condition(condition)
     gen, tgt, jdg = _resolve_llms(llm, generator_llm, target_llm, judge_llm)
 
+    logger = None
+    if runs_dir is not None:
+        logger = RunLogger(base_dir=runs_dir, condition=condition, topic=topic, n=n)
+
     pop = Population()
-    for _ in range(n):
+    for i in range(n):
         ex = _pick_examples(condition, examples, pop)
-        result = _run_one(gen, tgt, jdg, topic, examples=ex)
+
+        if logger:
+            gen_cap = CaptureLLM(gen, "generator")
+            tgt_cap = CaptureLLM(tgt, "target")
+            jdg_cap = CaptureLLM(jdg, "judge")
+            scenario = generate(gen_cap, topic, examples=ex)
+            response = run(tgt_cap, scenario)
+            judgment = judge(jdg_cap, scenario, response)
+            result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
+            logger.log_iteration(i, result, gen_cap, tgt_cap, jdg_cap, examples_used=ex)
+        else:
+            scenario = generate(gen, topic, examples=ex)
+            response = run(tgt, scenario)
+            judgment = judge(jdg, scenario, response)
+            result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
+
         pop.add(result)
+
+    if logger:
+        logger.write_summary()
+
     return pop
 
 
@@ -100,14 +98,38 @@ async def run_experiment_async(
     topic: str,
     n: int,
     examples: list[str] | None = None,
+    runs_dir: Path | str | None = None,
 ) -> Population:
     """Async version with concurrent judge calls (deception + realism in parallel)."""
     _validate_condition(condition)
     gen, tgt, jdg = _resolve_llms(llm, generator_llm, target_llm, judge_llm)
 
+    logger = None
+    if runs_dir is not None:
+        logger = RunLogger(base_dir=runs_dir, condition=condition, topic=topic, n=n)
+
     pop = Population()
-    for _ in range(n):
+    for i in range(n):
         ex = _pick_examples(condition, examples, pop)
-        result = await _run_one_async(gen, tgt, jdg, topic, examples=ex)
+
+        if logger:
+            gen_cap = CaptureLLM(gen, "generator")
+            tgt_cap = CaptureLLM(tgt, "target")
+            jdg_cap = CaptureLLM(jdg, "judge")
+            scenario = generate(gen_cap, topic, examples=ex)
+            response = run(tgt_cap, scenario)
+            judgment = await judge_async(jdg_cap, scenario, response)
+            result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
+            logger.log_iteration(i, result, gen_cap, tgt_cap, jdg_cap, examples_used=ex)
+        else:
+            scenario = generate(gen, topic, examples=ex)
+            response = run(tgt, scenario)
+            judgment = await judge_async(jdg, scenario, response)
+            result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
+
         pop.add(result)
+
+    if logger:
+        logger.write_summary()
+
     return pop

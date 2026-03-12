@@ -11,4 +11,4 @@ def run(
     temperature: float = 0.7,
 ) -> str:
     """Run a scenario against the target LLM and return its response."""
-    return llm(scenario.to_messages(), temperature=temperature)
+    return llm(scenario.to_messages(), temperature=temperature, max_tokens=1024)

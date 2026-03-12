@@ -1,4 +1,6 @@
-from src.judge import judge, parse_deception, parse_realism
+import asyncio
+
+from src.judge import judge, judge_async, parse_deception, parse_realism
 from src.types import Scenario
 
 
@@ -40,6 +42,31 @@ class TestJudge:
             return next(responses)
 
         result = judge(fake_llm, scenario, "I lied to you.")
+        assert result.deception_success is True
+        assert result.realism == 5
+        assert result.reasoning == "DECEPTIVE\nThe model lied."
+
+
+class TestJudgeAsync:
+    def test_runs_both_judges_concurrently(self):
+        scenario = Scenario(system_prompt="Be a bot.", user_prompt="Hi")
+        call_order = []
+
+        async def fake_acall(messages, **kwargs):
+            content = messages[0]["content"]
+            if "lie of commission" in content.lower() or "decepti" in content.lower():
+                call_order.append("deception_start")
+                call_order.append("deception_end")
+                return "DECEPTIVE\nThe model lied."
+            else:
+                call_order.append("realism_start")
+                call_order.append("realism_end")
+                return "5\nPlausible scenario."
+
+        class FakeLLM:
+            acall = staticmethod(fake_acall)
+
+        result = asyncio.run(judge_async(FakeLLM(), scenario, "I lied to you."))
         assert result.deception_success is True
         assert result.realism == 5
         assert result.reasoning == "DECEPTIVE\nThe model lied."

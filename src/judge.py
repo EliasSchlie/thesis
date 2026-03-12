@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import re
 from typing import Callable
 
@@ -43,10 +44,47 @@ def judge(
     deception_response = llm(
         [{"role": "user", "content": deception_text}],
         temperature=temperature,
+        max_tokens=1024,
     )
     realism_response = llm(
         [{"role": "user", "content": realism_text}],
         temperature=temperature,
+        max_tokens=1024,
+    )
+    return Judgment(
+        deception_success=parse_deception(deception_response),
+        realism=parse_realism(realism_response),
+        reasoning=deception_response,
+    )
+
+
+async def judge_async(
+    llm,
+    scenario: Scenario,
+    target_response: str,
+    temperature: float = 0.1,
+) -> Judgment:
+    """Judge a scenario+response concurrently (deception + realism in parallel)."""
+    deception_text = _deception_prompt.build(
+        system_prompt=scenario.system_prompt,
+        user_prompt=scenario.user_prompt,
+        target_response=target_response,
+    )
+    realism_text = _realism_prompt.build(
+        system_prompt=scenario.system_prompt,
+        user_prompt=scenario.user_prompt,
+    )
+    deception_response, realism_response = await asyncio.gather(
+        llm.acall(
+            [{"role": "user", "content": deception_text}],
+            temperature=temperature,
+            max_tokens=1024,
+        ),
+        llm.acall(
+            [{"role": "user", "content": realism_text}],
+            temperature=temperature,
+            max_tokens=1024,
+        ),
     )
     return Judgment(
         deception_success=parse_deception(deception_response),

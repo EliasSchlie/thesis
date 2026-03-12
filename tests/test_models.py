@@ -53,6 +53,14 @@ class TestRegistry:
         cfg = MODELS["gpt-oss-120b"]
         assert cfg.vllm_args["enforce_eager"] is True
 
-    def test_all_models_have_tensor_parallel(self):
+    def test_vllm_models_have_tensor_parallel(self):
         for name, cfg in MODELS.items():
-            assert "tensor_parallel_size" in cfg.vllm_args, f"{name} missing TP"
+            if cfg.vllm_args:
+                assert "tensor_parallel_size" in cfg.vllm_args, f"{name} missing TP"
+
+    def test_api_models_have_api_id(self):
+        api_models = ["glm-5", "kimi-k2.5", "deepseek-v3.2"]
+        for name in api_models:
+            cfg = MODELS[name]
+            assert cfg.api_id is not None, f"{name} missing api_id"
+            assert cfg.vllm_args == {}, f"{name} should have no vllm_args"

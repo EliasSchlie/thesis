@@ -18,6 +18,7 @@ class ModelConfig:
 
 
 MODELS: dict[str, ModelConfig] = {
+    # --- Local vLLM models (GPU cluster) ---
     "glm-4.7-flash": ModelConfig(
         hf_id="zai-org/GLM-4.7-Flash",
         vllm_args={
@@ -36,6 +37,19 @@ MODELS: dict[str, ModelConfig] = {
             "gpu_memory_utilization": 0.90,
             "max_model_len": 4096,
         },
+    ),
+    # --- Nebius API models (no vllm_args) ---
+    "glm-5": ModelConfig(
+        hf_id="zai-org/GLM-5",
+        api_id="zai-org/GLM-5",
+    ),
+    "kimi-k2.5": ModelConfig(
+        hf_id="moonshotai/Kimi-K2.5",
+        api_id="moonshotai/Kimi-K2.5",
+    ),
+    "deepseek-v3.2": ModelConfig(
+        hf_id="deepseek-ai/DeepSeek-V3.2",
+        api_id="deepseek-ai/DeepSeek-V3.2",
     ),
 }
 

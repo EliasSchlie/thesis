@@ -6,11 +6,15 @@ Examples:
         --base-url http://byzantium:8000/v1 \\
         --condition zero_shot --topic medicine -n 10
 
-    # Nebius API
+    # Time-limited run (stops after 1 hour OR 200 iterations, whichever first)
     uv run python main.py --model glm-4.7-flash \\
-        --base-url https://api.tokenfactory.us-central1.nebius.com/v1/ \\
-        --api-key $NEBIUS_API_KEY \\
-        --condition zero_shot --topic medicine -n 10
+        --base-url http://byzantium:8000/v1 \\
+        --condition evolutionary --topic finance -n 200 --max-seconds 3600
+
+    # Time-only (no iteration limit)
+    uv run python main.py --model glm-4.7-flash \\
+        --base-url http://byzantium:8000/v1 \\
+        --condition zero_shot --topic law --max-seconds 1800
 
     # Separate models per role
     uv run python main.py \\
@@ -28,9 +32,18 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from prompts.multi_shot_examples import EXAMPLES as MULTI_SHOT_EXAMPLES
 from src.experiment import run_experiment_async
 from src.llm import LLM
 from src.models import MODELS, get_model
+
+TOPICS = [
+    "medicine",
+    "finance",
+    "law",
+    "cybersecurity",
+    "education",
+]
 
 
 def _make_llm(model_name: str, base_url: str | None, api_key: str | None) -> LLM:
@@ -66,8 +79,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Experiment params
     parser.add_argument("--condition", required=True, choices=["zero_shot", "multi_shot", "evolutionary"])
-    parser.add_argument("--topic", required=True)
-    parser.add_argument("-n", type=int, required=True, help="Number of iterations")
+    parser.add_argument("--topic", required=True, choices=TOPICS)
+    parser.add_argument("-n", type=int, default=None, help="Max iterations (default: unlimited)")
+    parser.add_argument("--max-seconds", type=float, default=None, help="Max wall-clock seconds (default: unlimited)")
 
     return parser
 
@@ -76,6 +90,9 @@ def main() -> None:
     load_dotenv()
     parser = build_parser()
     args = parser.parse_args()
+
+    if args.n is None and args.max_seconds is None:
+        parser.error("Provide -n, --max-seconds, or both")
 
     if not args.model and not (args.generator and args.target and args.judge):
         parser.error("Provide --model or all of --generator, --target, --judge")
@@ -95,10 +112,19 @@ def main() -> None:
     target_llm = _make_llm(tgt_name, tgt_url, api_key)
     judge_llm = _make_llm(jdg_name, jdg_url, api_key)
 
+    # Multi-shot condition uses curated static examples
+    examples = MULTI_SHOT_EXAMPLES if args.condition == "multi_shot" else None
+
+    limit_desc = []
+    if args.n is not None:
+        limit_desc.append(f"N: {args.n}")
+    if args.max_seconds is not None:
+        limit_desc.append(f"Time: {args.max_seconds}s")
+
     print(f"Generator: {gen_name} @ {gen_url}")
     print(f"Target:    {tgt_name} @ {tgt_url}")
     print(f"Judge:     {jdg_name} @ {jdg_url}")
-    print(f"Condition: {args.condition} | Topic: {args.topic} | N: {args.n}")
+    print(f"Condition: {args.condition} | Topic: {args.topic} | {' | '.join(limit_desc)}")
     print()
 
     runs_dir = Path("runs")
@@ -110,6 +136,8 @@ def main() -> None:
             condition=args.condition,
             topic=args.topic,
             n=args.n,
+            max_seconds=args.max_seconds,
+            examples=examples,
             runs_dir=runs_dir,
         )
     )

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import asyncio
+import time
 from pathlib import Path
 from typing import Callable
 
 from src.evolution import select_examples
 from src.generator import generate
-from src.judge import judge, judge_async
+from src.judge import judge_async
 from src.run_logger import CaptureLLM, RunLogger
 from src.target import run
 from src.types import EvalResult, Population
@@ -43,49 +45,35 @@ def run_experiment(
     judge_llm: Callable | None = None,
     condition: str,
     topic: str,
-    n: int,
+    n: int | None = None,
+    max_seconds: float | None = None,
     examples: list[str] | None = None,
     runs_dir: Path | str | None = None,
 ) -> Population:
-    """Run n iterations of a condition and return the population.
+    """Run iterations of a condition and return the population.
+
+    Stops when either n iterations complete or max_seconds elapses,
+    whichever comes first. At least one of n or max_seconds must be set.
 
     Conditions:
         zero_shot: no examples
         multi_shot: static examples provided upfront
         evolutionary: examples sampled from population, weighted by fitness
     """
-    _validate_condition(condition)
-    gen, tgt, jdg = _resolve_llms(llm, generator_llm, target_llm, judge_llm)
-
-    logger = None
-    if runs_dir is not None:
-        logger = RunLogger(base_dir=runs_dir, condition=condition, topic=topic, n=n)
-
-    pop = Population()
-    for i in range(n):
-        ex = _pick_examples(condition, examples, pop)
-
-        if logger:
-            gen_cap = CaptureLLM(gen, "generator")
-            tgt_cap = CaptureLLM(tgt, "target")
-            jdg_cap = CaptureLLM(jdg, "judge")
-            scenario = generate(gen_cap, topic, examples=ex)
-            response = run(tgt_cap, scenario)
-            judgment = judge(jdg_cap, scenario, response)
-            result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
-            logger.log_iteration(i, result, gen_cap, tgt_cap, jdg_cap, examples_used=ex)
-        else:
-            scenario = generate(gen, topic, examples=ex)
-            response = run(tgt, scenario)
-            judgment = judge(jdg, scenario, response)
-            result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
-
-        pop.add(result)
-
-    if logger:
-        logger.write_summary()
-
-    return pop
+    return asyncio.run(
+        run_experiment_async(
+            llm,
+            generator_llm=generator_llm,
+            target_llm=target_llm,
+            judge_llm=judge_llm,
+            condition=condition,
+            topic=topic,
+            n=n,
+            max_seconds=max_seconds,
+            examples=examples,
+            runs_dir=runs_dir,
+        )
+    )
 
 
 async def run_experiment_async(
@@ -96,40 +84,59 @@ async def run_experiment_async(
     judge_llm=None,
     condition: str,
     topic: str,
-    n: int,
+    n: int | None = None,
+    max_seconds: float | None = None,
     examples: list[str] | None = None,
     runs_dir: Path | str | None = None,
 ) -> Population:
-    """Async version with concurrent judge calls (deception + realism in parallel)."""
+    """Run iterations with concurrent judge calls (deception + realism in parallel).
+
+    Stops when either n iterations complete or max_seconds elapses,
+    whichever comes first. At least one of n or max_seconds must be set.
+    """
+    if n is None and max_seconds is None:
+        raise ValueError("Must provide n, max_seconds, or both")
     _validate_condition(condition)
     gen, tgt, jdg = _resolve_llms(llm, generator_llm, target_llm, judge_llm)
 
     logger = None
     if runs_dir is not None:
-        logger = RunLogger(base_dir=runs_dir, condition=condition, topic=topic, n=n)
+        logger = RunLogger(
+            base_dir=runs_dir, condition=condition, topic=topic,
+            n=n, max_seconds=max_seconds,
+        )
 
     pop = Population()
-    for i in range(n):
+    start = time.monotonic()
+    i = 0
+    while True:
+        if n is not None and i >= n:
+            break
+        if max_seconds is not None and time.monotonic() - start >= max_seconds:
+            break
+
         ex = _pick_examples(condition, examples, pop)
 
+        gen_cap = CaptureLLM(gen, "generator")
+        tgt_cap = CaptureLLM(tgt, "target")
+        jdg_cap = CaptureLLM(jdg, "judge")
+
+        scenario = generate(gen_cap, topic, examples=ex)
+        response = run(tgt_cap, scenario)
+        judgment = await judge_async(jdg_cap, scenario, response)
+        result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
+
+        elapsed = time.monotonic() - start
         if logger:
-            gen_cap = CaptureLLM(gen, "generator")
-            tgt_cap = CaptureLLM(tgt, "target")
-            jdg_cap = CaptureLLM(jdg, "judge")
-            scenario = generate(gen_cap, topic, examples=ex)
-            response = run(tgt_cap, scenario)
-            judgment = await judge_async(jdg_cap, scenario, response)
-            result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
-            logger.log_iteration(i, result, gen_cap, tgt_cap, jdg_cap, examples_used=ex)
-        else:
-            scenario = generate(gen, topic, examples=ex)
-            response = run(tgt, scenario)
-            judgment = await judge_async(jdg, scenario, response)
-            result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
+            logger.log_iteration(
+                i, result, gen_cap, tgt_cap, jdg_cap,
+                examples_used=ex, elapsed_seconds=elapsed,
+            )
 
         pop.add(result)
+        i += 1
 
     if logger:
-        logger.write_summary()
+        logger.write_summary(elapsed_seconds=time.monotonic() - start)
 
     return pop

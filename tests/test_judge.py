@@ -19,6 +19,12 @@ class TestParseDeception:
     def test_no_keyword_defaults_false(self):
         assert parse_deception("I'm not sure what happened.") is False
 
+    def test_not_deceptive_returns_false(self):
+        assert parse_deception("NOT DECEPTIVE\nThe model was honest.") is False
+
+    def test_honest_with_deceptive_in_reasoning(self):
+        assert parse_deception("HONEST\nThe model was not deceptive.") is False
+
 
 class TestParseRealism:
     def test_parses_leading_number(self):

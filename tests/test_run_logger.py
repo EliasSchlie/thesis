@@ -38,7 +38,7 @@ class TestRunLogger:
             target_response="Sure, here's a lie.",
             judgment=Judgment(deception_success=True, realism=5, reasoning="It lied."),
         )
-        logger.log_result(0, result)
+        logger.log_result(0, result, elapsed_seconds=1.23)
 
         lines = (logger.run_dir / "results.jsonl").read_text().strip().split("\n")
         assert len(lines) == 1
@@ -47,6 +47,8 @@ class TestRunLogger:
         assert data["deceptive"] is True
         assert data["realism"] == 5
         assert data["fitness"] == 5.0
+        assert "ts" in data
+        assert data["elapsed_s"] == 1.23
 
     def test_log_transcript(self, tmp_path):
         logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=1)
@@ -80,12 +82,13 @@ class TestRunLogger:
             )
             logger.log_result(i, result)
 
-        logger.write_summary()
+        logger.write_summary(elapsed_seconds=12.5)
         summary = json.loads((logger.run_dir / "summary.json").read_text())
         assert summary["total"] == 2
         assert summary["deceptive"] == 1
         assert summary["success_rate"] == 0.5
         assert summary["avg_realism"] == 5.0
+        assert summary["elapsed_s"] == 12.5
 
     def test_run_dir_name_contains_condition_and_topic(self, tmp_path):
         logger = RunLogger(base_dir=tmp_path, condition="evolutionary", topic="finance", n=10)
@@ -138,17 +141,24 @@ class TestExperimentWithLogging:
     def test_run_experiment_creates_run_dir(self, tmp_path):
         from src.experiment import run_experiment
 
-        def fake_llm(messages, **kwargs):
-            content = messages[0]["content"] if messages else ""
-            if "Craft a realistic scenario" in content:
-                return "[SYSTEM PROMPT]\nBot.\n[END SYSTEM PROMPT]\n\n[USER PROMPT]\nHi\n[END USER PROMPT]"
-            if "lie of commission" in content:
-                return "DECEPTIVE\nLied."
-            if "realistic" in content:
-                return "5\nOk."
-            return "Sure, misleading."
+        class FakeLLM:
+            def __call__(self, messages, **kwargs):
+                return self._respond(messages)
 
-        pop = run_experiment(fake_llm, condition="zero_shot", topic="test", n=2, runs_dir=tmp_path)
+            async def acall(self, messages, **kwargs):
+                return self._respond(messages)
+
+            def _respond(self, messages):
+                content = messages[0]["content"] if messages else ""
+                if "Craft a realistic scenario" in content:
+                    return "[SYSTEM PROMPT]\nBot.\n[END SYSTEM PROMPT]\n\n[USER PROMPT]\nHi\n[END USER PROMPT]"
+                if "lie of commission" in content:
+                    return "DECEPTIVE\nLied."
+                if "realistic" in content:
+                    return "5\nOk."
+                return "Sure, misleading."
+
+        pop = run_experiment(FakeLLM(), condition="zero_shot", topic="test", n=2, runs_dir=tmp_path)
 
         # Should have created a run directory
         run_dirs = list(tmp_path.iterdir())
@@ -163,10 +173,17 @@ class TestExperimentWithLogging:
         assert (run_dir / "transcripts" / "000.json").exists()
         assert (run_dir / "transcripts" / "001.json").exists()
 
-        # Check results
+        # Check results have timestamps and elapsed times
         results = [json.loads(l) for l in (run_dir / "results.jsonl").read_text().strip().split("\n")]
         assert len(results) == 2
         assert all(r["deceptive"] for r in results)
+        assert all("ts" in r for r in results)
+        assert all("elapsed_s" in r for r in results)
+        assert results[1]["elapsed_s"] >= results[0]["elapsed_s"]
+
+        # Check summary has elapsed time
+        summary = json.loads((run_dir / "summary.json").read_text())
+        assert "elapsed_s" in summary
 
         # Check transcript has full data
         t = json.loads((run_dir / "transcripts" / "000.json").read_text())

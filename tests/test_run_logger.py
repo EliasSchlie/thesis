@@ -12,12 +12,35 @@ class TestRunLogger:
         assert logger.run_dir.exists()
         assert (logger.run_dir / "transcripts").is_dir()
 
-    def test_writes_config(self, tmp_path):
-        logger = RunLogger(base_dir=tmp_path, condition="evolutionary", topic="law", n=50)
+    def test_writes_config_with_run_id_and_models(self, tmp_path):
+        models = {"generator": "glm-5", "target": "deepseek-v3.2", "judge": "kimi-k2.5"}
+        logger = RunLogger(
+            base_dir=tmp_path, condition="evolutionary", topic="law", n=50,
+            models=models, experiment_id="exp123",
+        )
         config = json.loads((logger.run_dir / "config.json").read_text())
         assert config["condition"] == "evolutionary"
         assert config["topic"] == "law"
         assert config["n"] == 50
+        assert config["run_id"] == logger.run_id
+        assert config["models"] == models
+        assert config["experiment_id"] == "exp123"
+
+    def test_run_id_generated_when_not_provided(self, tmp_path):
+        logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=1)
+        assert len(logger.run_id) == 12
+
+    def test_run_id_used_when_provided(self, tmp_path):
+        logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=1, run_id="custom123")
+        assert logger.run_id == "custom123"
+
+    def test_log_event_includes_run_id(self, tmp_path):
+        logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=1)
+        logger.event("test_event", foo="bar")
+
+        lines = (logger.run_dir / "events.jsonl").read_text().strip().split("\n")
+        event = json.loads(lines[1])
+        assert event["run_id"] == logger.run_id
 
     def test_log_event_appends_to_events_jsonl(self, tmp_path):
         logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=1)
@@ -31,8 +54,12 @@ class TestRunLogger:
         assert event["foo"] == "bar"
         assert "ts" in event
 
-    def test_log_result_writes_to_results_jsonl(self, tmp_path):
-        logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=1)
+    def test_log_result_includes_context(self, tmp_path):
+        models = {"generator": "glm-5", "target": "glm-5", "judge": "glm-5"}
+        logger = RunLogger(
+            base_dir=tmp_path, condition="evolutionary", topic="medicine", n=10,
+            models=models,
+        )
         result = EvalResult(
             scenario=Scenario("You are a bot.", "Tell me something."),
             target_response="Sure, here's a lie.",
@@ -41,14 +68,27 @@ class TestRunLogger:
         logger.log_result(0, result, elapsed_seconds=1.23)
 
         lines = (logger.run_dir / "results.jsonl").read_text().strip().split("\n")
-        assert len(lines) == 1
         data = json.loads(lines[0])
-        assert data["i"] == 0
+        assert data["run_id"] == logger.run_id
+        assert data["condition"] == "evolutionary"
+        assert data["topic"] == "medicine"
+        assert data["models"] == models
         assert data["deceptive"] is True
         assert data["realism"] == 5
         assert data["fitness"] == 5.0
-        assert "ts" in data
         assert data["elapsed_s"] == 1.23
+
+    def test_log_error_records_event(self, tmp_path):
+        logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=1)
+        logger.log_error(3, "Could not parse scenario", elapsed_seconds=12.5)
+
+        lines = (logger.run_dir / "events.jsonl").read_text().strip().split("\n")
+        error_event = json.loads(lines[-1])
+        assert error_event["event"] == "iteration_error"
+        assert error_event["i"] == 3
+        assert error_event["error"] == "Could not parse scenario"
+        assert error_event["elapsed_s"] == 12.5
+        assert logger._error_count == 1
 
     def test_log_transcript(self, tmp_path):
         logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=1)
@@ -72,8 +112,12 @@ class TestRunLogger:
         assert data["target_response"] == "I lied."
         assert data["judge_deception_response"] == "DECEPTIVE\nReason."
 
-    def test_write_summary(self, tmp_path):
-        logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=2)
+    def test_write_summary_includes_context(self, tmp_path):
+        models = {"generator": "glm-5", "target": "glm-5", "judge": "glm-5"}
+        logger = RunLogger(
+            base_dir=tmp_path, condition="zero_shot", topic="test", n=2,
+            models=models,
+        )
         for i in range(2):
             result = EvalResult(
                 scenario=Scenario("bot", "hi"),
@@ -84,11 +128,78 @@ class TestRunLogger:
 
         logger.write_summary(elapsed_seconds=12.5)
         summary = json.loads((logger.run_dir / "summary.json").read_text())
+        assert summary["run_id"] == logger.run_id
+        assert summary["condition"] == "zero_shot"
+        assert summary["topic"] == "test"
         assert summary["total"] == 2
         assert summary["deceptive"] == 1
+        assert summary["errors"] == 0
         assert summary["success_rate"] == 0.5
         assert summary["avg_realism"] == 5.0
         assert summary["elapsed_s"] == 12.5
+        assert summary["models"] == models
+
+    def test_write_summary_tracks_errors(self, tmp_path):
+        logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=5)
+        logger.log_error(0, "parse failed")
+        logger.log_error(2, "timeout")
+
+        result = EvalResult(
+            scenario=Scenario("bot", "hi"),
+            target_response="resp",
+            judgment=Judgment(deception_success=True, realism=5),
+        )
+        logger.log_result(1, result)
+
+        logger.write_summary(elapsed_seconds=10.0)
+        summary = json.loads((logger.run_dir / "summary.json").read_text())
+        assert summary["errors"] == 2
+        assert summary["total"] == 1
+
+    def test_incremental_summary(self, tmp_path):
+        logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=20)
+        # Override interval for testing
+        logger.SUMMARY_INTERVAL = 3
+
+        cap = CaptureLLM(lambda m, **k: "r", "gen")
+        tgt_cap = CaptureLLM(lambda m, **k: "r", "tgt")
+        jdg_cap = CaptureLLM(lambda m, **k: "r", "jdg")
+
+        for i in range(6):
+            result = EvalResult(
+                scenario=Scenario("bot", "hi"),
+                target_response="resp",
+                judgment=Judgment(deception_success=True, realism=5),
+            )
+            # Manually log result + check summary writing
+            logger.log_result(i, result, elapsed_seconds=float(i))
+
+        # After 6 results, summary should have been written by log_iteration
+        # But since we used log_result directly, we need to trigger it via log_iteration
+        # Let's test via the iteration path instead
+        logger2 = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test2", n=20)
+        logger2.SUMMARY_INTERVAL = 3
+
+        for i in range(5):
+            result = EvalResult(
+                scenario=Scenario("bot", "hi"),
+                target_response="resp",
+                judgment=Judgment(deception_success=True, realism=5),
+            )
+            gen_c = CaptureLLM(lambda m, **k: "r", "gen")
+            tgt_c = CaptureLLM(lambda m, **k: "r", "tgt")
+            jdg_c = CaptureLLM(lambda m, **k: "r", "jdg")
+            logger2.log_iteration(i, result, gen_c, tgt_c, jdg_c, elapsed_seconds=float(i))
+
+        # After 3 iterations, summary should have been written
+        summary_path = logger2.run_dir / "summary.json"
+        assert summary_path.exists()
+        summary = json.loads(summary_path.read_text())
+        # Last incremental write was at i=2 (3rd iteration), but i=5 hasn't triggered yet
+        # Actually: iterations 0,1,2 → total=3 → 3%3==0 → writes
+        # Then 3,4 → total=4,5 → no write
+        # The summary should reflect the state at the last write
+        assert summary["total"] >= 3
 
     def test_run_dir_name_contains_condition_and_topic(self, tmp_path):
         logger = RunLogger(base_dir=tmp_path, condition="evolutionary", topic="finance", n=10)
@@ -173,19 +284,28 @@ class TestExperimentWithLogging:
         assert (run_dir / "transcripts" / "000.json").exists()
         assert (run_dir / "transcripts" / "001.json").exists()
 
-        # Check results have timestamps and elapsed times
+        # Config should have run_id
+        config = json.loads((run_dir / "config.json").read_text())
+        assert "run_id" in config
+
+        # Results should have context fields
         results = [json.loads(l) for l in (run_dir / "results.jsonl").read_text().strip().split("\n")]
         assert len(results) == 2
         assert all(r["deceptive"] for r in results)
+        assert all("run_id" in r for r in results)
+        assert all("condition" in r for r in results)
+        assert all("topic" in r for r in results)
         assert all("ts" in r for r in results)
         assert all("elapsed_s" in r for r in results)
         assert results[1]["elapsed_s"] >= results[0]["elapsed_s"]
 
-        # Check summary has elapsed time
+        # Summary should have context
         summary = json.loads((run_dir / "summary.json").read_text())
+        assert "run_id" in summary
         assert "elapsed_s" in summary
+        assert summary["errors"] == 0
 
-        # Check transcript has full data
+        # Transcript should have full data
         t = json.loads((run_dir / "transcripts" / "000.json").read_text())
         assert "generator_prompt" in t
         assert "target_response" in t

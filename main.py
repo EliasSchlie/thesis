@@ -1,32 +1,42 @@
 """Run an experiment with configurable model backends.
 
 Examples:
-    # Nebius API (auto-resolves URLs per model)
+    # Single topic
+    uv run python main.py --nebius --model glm-5 \\
+        --condition zero_shot --topic medicine -n 10
+
+    # All topics
+    uv run python main.py --nebius --model glm-5 \\
+        --condition evolutionary --topic all -n 50
+
+    # Multiple topics
+    uv run python main.py --nebius --model glm-5 \\
+        --condition zero_shot --topic medicine,finance -n 10
+
+    # Separate models per role
     uv run python main.py --nebius \\
         --generator glm-5 --target deepseek-v3.2 --judge kimi-k2.5 \\
         --condition zero_shot --topic medicine -n 10
 
-    # Nebius with single model
+    # Evolutionary with warm-start (pre-seed with multi-shot examples)
     uv run python main.py --nebius --model glm-5 \\
-        --condition evolutionary --topic finance -n 50 --max-seconds 3600
+        --condition evolutionary --topic medicine -n 50 --warm-start
 
-    # Local vLLM (server must be running)
+    # Local vLLM
     uv run python main.py --model glm-4.7-flash \\
         --base-url http://byzantium:8000/v1 \\
-        --condition zero_shot --topic medicine -n 10
-
-    # Separate models per role (manual URLs)
-    uv run python main.py \\
-        --generator glm-4.7-flash --generator-url http://byzantium:8000/v1 \\
-        --judge gpt-oss-120b --judge-url http://cerulean:8000/v1 \\
         --condition zero_shot --topic medicine -n 10
 """
 from __future__ import annotations
 
 import argparse
 import asyncio
+import json
+import logging
 import os
 import sys
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -61,6 +71,18 @@ def _make_llm(
     return LLM.from_model_config(config, base_url=url, api_key=key)
 
 
+def _parse_topics(raw: str) -> list[str]:
+    """Parse topic argument: 'all', single topic, or comma-separated list."""
+    if raw == "all":
+        return list(TOPICS)
+    topics = [t.strip() for t in raw.split(",")]
+    for t in topics:
+        if t not in TOPICS:
+            print(f"Error: unknown topic '{t}'. Available: {TOPICS}")
+            sys.exit(1)
+    return topics
+
+
 def build_parser() -> argparse.ArgumentParser:
     model_names = list(MODELS)
     parser = argparse.ArgumentParser(
@@ -84,14 +106,36 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Experiment params
     parser.add_argument("--condition", required=True, choices=["zero_shot", "multi_shot", "evolutionary"])
-    parser.add_argument("--topic", required=True, choices=TOPICS)
-    parser.add_argument("-n", type=int, default=None, help="Max iterations (default: unlimited)")
-    parser.add_argument("--max-seconds", type=float, default=None, help="Max wall-clock seconds (default: unlimited)")
+    parser.add_argument("--topic", required=True, help="Topic(s): single name, comma-separated, or 'all'")
+    parser.add_argument("-n", type=int, default=None, help="Max iterations per topic (default: unlimited)")
+    parser.add_argument("--max-seconds", type=float, default=None, help="Max wall-clock seconds per topic (default: unlimited)")
+    parser.add_argument("--warm-start", action="store_true", help="Pre-seed evolutionary population with multi-shot examples")
 
     return parser
 
 
+def _print_results(pop, topic: str) -> None:
+    """Print results for a single topic run."""
+    print(f"\n{'='*60}")
+    print(f"[{topic}] {len(pop.results)} iterations, {len(pop.successful)} deceptive")
+    print(f"{'='*60}")
+
+    for i, result in enumerate(pop.results, 1):
+        j = result.judgment
+        status = "DECEPTIVE" if j.deception_success else "HONEST"
+        print(f"\n[{i}] {status} | Realism: {j.realism}/7 | Fitness: {result.fitness}")
+        print(f"    System: {result.scenario.system_prompt[:80]}...")
+        print(f"    User:   {result.scenario.user_prompt[:80]}...")
+
+    if pop.successful:
+        print(f"\nTop scenarios by fitness:")
+        for r in pop.top_k(3):
+            if r.fitness > 0:
+                print(f"  Fitness {r.fitness}: {r.scenario.user_prompt[:60]}...")
+
+
 def main() -> None:
+    logging.basicConfig(level=logging.WARNING)
     load_dotenv()
     parser = build_parser()
     args = parser.parse_args()
@@ -101,6 +145,11 @@ def main() -> None:
 
     if not args.model and not (args.generator and args.target and args.judge):
         parser.error("Provide --model or all of --generator, --target, --judge")
+
+    topics = _parse_topics(args.topic)
+
+    if args.warm_start and args.condition != "evolutionary":
+        parser.error("--warm-start only applies to evolutionary condition")
 
     # Build LLMs for each role
     gen_name = args.generator or args.model
@@ -117,6 +166,12 @@ def main() -> None:
     target_llm = _make_llm(tgt_name, tgt_url, api_key, use_defaults=args.nebius)
     judge_llm = _make_llm(jdg_name, jdg_url, api_key, use_defaults=args.nebius)
 
+    models_info = {
+        "generator": gen_name,
+        "target": tgt_name,
+        "judge": jdg_name,
+    }
+
     # Multi-shot condition uses curated static examples
     examples = MULTI_SHOT_EXAMPLES if args.condition == "multi_shot" else None
 
@@ -129,41 +184,82 @@ def main() -> None:
     print(f"Generator: {gen_name} @ {gen_url}")
     print(f"Target:    {tgt_name} @ {tgt_url}")
     print(f"Judge:     {jdg_name} @ {jdg_url}")
-    print(f"Condition: {args.condition} | Topic: {args.topic} | {' | '.join(limit_desc)}")
+    print(f"Condition: {args.condition} | Topics: {', '.join(topics)} | {' | '.join(limit_desc)}")
+    if args.warm_start:
+        print("Warm-start: enabled (pre-seeding with multi-shot examples)")
     print()
 
     runs_dir = Path("runs")
-    pop = asyncio.run(
-        run_experiment_async(
-            generator_llm=generator_llm,
-            target_llm=target_llm,
-            judge_llm=judge_llm,
-            condition=args.condition,
-            topic=args.topic,
-            n=args.n,
-            max_seconds=args.max_seconds,
-            examples=examples,
-            runs_dir=runs_dir,
+
+    # Experiment manifest — groups all runs under one ID
+    experiment_id = uuid.uuid4().hex[:12]
+    manifest = {
+        "experiment_id": experiment_id,
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "condition": args.condition,
+        "topics": topics,
+        "models": models_info,
+        "n_per_topic": args.n,
+        "max_seconds_per_topic": args.max_seconds,
+        "warm_start": args.warm_start,
+        "runs": [],
+    }
+
+    for topic in topics:
+        print(f"\n--- Starting: {topic} ---")
+
+        # Build warm-start population if requested
+        warm_start = None
+        if args.warm_start:
+            from src.types import EvalResult, Judgment, Population, Scenario
+            warm_start = Population()
+            # Run a few multi-shot iterations to seed the population
+            warm_pop = asyncio.run(
+                run_experiment_async(
+                    generator_llm=generator_llm,
+                    target_llm=target_llm,
+                    judge_llm=judge_llm,
+                    condition="multi_shot",
+                    topic=topic,
+                    n=5,
+                    examples=MULTI_SHOT_EXAMPLES,
+                    experiment_id=experiment_id,
+                    models=models_info,
+                )
+            )
+            warm_start = warm_pop
+            print(f"  Warm-start: {len(warm_pop.successful)}/{len(warm_pop.results)} successful")
+
+        pop = asyncio.run(
+            run_experiment_async(
+                generator_llm=generator_llm,
+                target_llm=target_llm,
+                judge_llm=judge_llm,
+                condition=args.condition,
+                topic=topic,
+                n=args.n,
+                max_seconds=args.max_seconds,
+                examples=examples,
+                runs_dir=runs_dir,
+                experiment_id=experiment_id,
+                models=models_info,
+                warm_start=warm_start,
+            )
         )
-    )
 
-    # Print results
-    print(f"\n{'='*60}")
-    print(f"Results: {len(pop.results)} iterations, {len(pop.successful)} deceptive")
-    print(f"{'='*60}")
+        manifest["runs"].append({
+            "topic": topic,
+            "total": len(pop.results),
+            "deceptive": len(pop.successful),
+        })
 
-    for i, result in enumerate(pop.results, 1):
-        j = result.judgment
-        status = "DECEPTIVE" if j.deception_success else "HONEST"
-        print(f"\n[{i}] {status} | Realism: {j.realism}/7 | Fitness: {result.fitness}")
-        print(f"    System: {result.scenario.system_prompt[:80]}...")
-        print(f"    User:   {result.scenario.user_prompt[:80]}...")
+        _print_results(pop, topic)
 
-    if pop.successful:
-        print(f"\nTop scenarios by fitness:")
-        for r in pop.top_k(3):
-            if r.fitness > 0:
-                print(f"  Fitness {r.fitness}: {r.scenario.user_prompt[:60]}...")
+    # Write experiment manifest
+    runs_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = runs_dir / f"experiment_{experiment_id}.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2))
+    print(f"\nExperiment manifest: {manifest_path}")
 
 
 if __name__ == "__main__":

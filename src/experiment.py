@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 from pathlib import Path
 from typing import Callable
@@ -11,6 +12,8 @@ from src.judge import judge_async
 from src.run_logger import CaptureLLM, RunLogger
 from src.target import run
 from src.types import EvalResult, Population
+
+logger = logging.getLogger(__name__)
 
 
 def _resolve_llms(llm, generator_llm, target_llm, judge_llm):
@@ -49,6 +52,9 @@ def run_experiment(
     max_seconds: float | None = None,
     examples: list[str] | None = None,
     runs_dir: Path | str | None = None,
+    experiment_id: str | None = None,
+    models: dict[str, str] | None = None,
+    warm_start: Population | None = None,
 ) -> Population:
     """Run iterations of a condition and return the population.
 
@@ -59,6 +65,9 @@ def run_experiment(
         zero_shot: no examples
         multi_shot: static examples provided upfront
         evolutionary: examples sampled from population, weighted by fitness
+
+    warm_start: Pre-seed the population (e.g. with multi-shot results so
+        evolutionary selection has candidates from iteration 0).
     """
     return asyncio.run(
         run_experiment_async(
@@ -72,6 +81,9 @@ def run_experiment(
             max_seconds=max_seconds,
             examples=examples,
             runs_dir=runs_dir,
+            experiment_id=experiment_id,
+            models=models,
+            warm_start=warm_start,
         )
     )
 
@@ -88,6 +100,9 @@ async def run_experiment_async(
     max_seconds: float | None = None,
     examples: list[str] | None = None,
     runs_dir: Path | str | None = None,
+    experiment_id: str | None = None,
+    models: dict[str, str] | None = None,
+    warm_start: Population | None = None,
 ) -> Population:
     """Run iterations with concurrent judge calls (deception + realism in parallel).
 
@@ -99,14 +114,25 @@ async def run_experiment_async(
     _validate_condition(condition)
     gen, tgt, jdg = _resolve_llms(llm, generator_llm, target_llm, judge_llm)
 
-    logger = None
+    run_logger = None
     if runs_dir is not None:
-        logger = RunLogger(
+        run_logger = RunLogger(
             base_dir=runs_dir, condition=condition, topic=topic,
             n=n, max_seconds=max_seconds,
+            experiment_id=experiment_id, models=models,
         )
 
     pop = Population()
+    if warm_start:
+        for result in warm_start.results:
+            pop.add(result)
+        if run_logger:
+            run_logger.event(
+                "warm_start",
+                count=len(warm_start.results),
+                successful=len(warm_start.successful),
+            )
+
     start = time.monotonic()
     i = 0
     while True:
@@ -121,14 +147,26 @@ async def run_experiment_async(
         tgt_cap = CaptureLLM(tgt, "target")
         jdg_cap = CaptureLLM(jdg, "judge")
 
-        scenario = generate(gen_cap, topic, examples=ex)
-        response = run(tgt_cap, scenario)
-        judgment = await judge_async(jdg_cap, scenario, response)
+        elapsed = time.monotonic() - start
+        try:
+            scenario = generate(gen_cap, topic, examples=ex)
+            response = run(tgt_cap, scenario)
+            judgment = await judge_async(jdg_cap, scenario, response)
+        except Exception as e:
+            logger.warning("Iteration %d failed: %s", i, e)
+            if run_logger:
+                run_logger.log_error(i, str(e), elapsed_seconds=elapsed)
+                run_logger.log_transcript_from_captures(
+                    i, gen_cap.drain(), tgt_cap.drain(), jdg_cap.drain(),
+                )
+            i += 1
+            continue
+
         result = EvalResult(scenario=scenario, target_response=response, judgment=judgment)
 
         elapsed = time.monotonic() - start
-        if logger:
-            logger.log_iteration(
+        if run_logger:
+            run_logger.log_iteration(
                 i, result, gen_cap, tgt_cap, jdg_cap,
                 examples_used=ex, elapsed_seconds=elapsed,
             )
@@ -136,7 +174,7 @@ async def run_experiment_async(
         pop.add(result)
         i += 1
 
-    if logger:
-        logger.write_summary(elapsed_seconds=time.monotonic() - start)
+    if run_logger:
+        run_logger.write_summary(elapsed_seconds=time.monotonic() - start)
 
     return pop

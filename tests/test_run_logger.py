@@ -156,29 +156,9 @@ class TestRunLogger:
         assert summary["errors"] == 2
         assert summary["total"] == 1
 
-    def test_incremental_summary(self, tmp_path):
+    def test_incremental_summary_writes_checkpoint(self, tmp_path):
         logger = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test", n=20)
-        # Override interval for testing
         logger.SUMMARY_INTERVAL = 3
-
-        cap = CaptureLLM(lambda m, **k: "r", "gen")
-        tgt_cap = CaptureLLM(lambda m, **k: "r", "tgt")
-        jdg_cap = CaptureLLM(lambda m, **k: "r", "jdg")
-
-        for i in range(6):
-            result = EvalResult(
-                scenario=Scenario("bot", "hi"),
-                target_response="resp",
-                judgment=Judgment(deception_success=True, realism=5),
-            )
-            # Manually log result + check summary writing
-            logger.log_result(i, result, elapsed_seconds=float(i))
-
-        # After 6 results, summary should have been written by log_iteration
-        # But since we used log_result directly, we need to trigger it via log_iteration
-        # Let's test via the iteration path instead
-        logger2 = RunLogger(base_dir=tmp_path, condition="zero_shot", topic="test2", n=20)
-        logger2.SUMMARY_INTERVAL = 3
 
         for i in range(5):
             result = EvalResult(
@@ -189,17 +169,18 @@ class TestRunLogger:
             gen_c = CaptureLLM(lambda m, **k: "r", "gen")
             tgt_c = CaptureLLM(lambda m, **k: "r", "tgt")
             jdg_c = CaptureLLM(lambda m, **k: "r", "jdg")
-            logger2.log_iteration(i, result, gen_c, tgt_c, jdg_c, elapsed_seconds=float(i))
+            logger.log_iteration(i, result, gen_c, tgt_c, jdg_c, elapsed_seconds=float(i))
 
-        # After 3 iterations, summary should have been written
-        summary_path = logger2.run_dir / "summary.json"
+        # After 3 iterations (total=3, 3%3==0), summary should have been written
+        summary_path = logger.run_dir / "summary.json"
         assert summary_path.exists()
         summary = json.loads(summary_path.read_text())
-        # Last incremental write was at i=2 (3rd iteration), but i=5 hasn't triggered yet
-        # Actually: iterations 0,1,2 → total=3 → 3%3==0 → writes
-        # Then 3,4 → total=4,5 → no write
-        # The summary should reflect the state at the last write
         assert summary["total"] >= 3
+
+        # Should emit summary_checkpoint, not experiment_end
+        events = (logger.run_dir / "events.jsonl").read_text().strip().split("\n")
+        checkpoint_events = [json.loads(e) for e in events if json.loads(e)["event"] == "summary_checkpoint"]
+        assert len(checkpoint_events) == 1  # Only at total=3
 
     def test_run_dir_name_contains_condition_and_topic(self, tmp_path):
         logger = RunLogger(base_dir=tmp_path, condition="evolutionary", topic="finance", n=10)

@@ -46,6 +46,8 @@ from src.experiment import run_experiment_async
 from src.llm import LLM
 from src.models import MODELS, get_model
 
+WARM_START_N = 5  # Number of multi-shot iterations to seed evolutionary population
+
 TOPICS = [
     "medicine",
     "finance",
@@ -71,15 +73,14 @@ def _make_llm(
     return LLM.from_model_config(config, base_url=url, api_key=key)
 
 
-def _parse_topics(raw: str) -> list[str]:
+def _parse_topics(raw: str, parser: argparse.ArgumentParser) -> list[str]:
     """Parse topic argument: 'all', single topic, or comma-separated list."""
     if raw == "all":
         return list(TOPICS)
     topics = [t.strip() for t in raw.split(",")]
     for t in topics:
         if t not in TOPICS:
-            print(f"Error: unknown topic '{t}'. Available: {TOPICS}")
-            sys.exit(1)
+            parser.error(f"unknown topic '{t}'. Available: {TOPICS}")
     return topics
 
 
@@ -146,7 +147,7 @@ def main() -> None:
     if not args.model and not (args.generator and args.target and args.judge):
         parser.error("Provide --model or all of --generator, --target, --judge")
 
-    topics = _parse_topics(args.topic)
+    topics = _parse_topics(args.topic, parser)
 
     if args.warm_start and args.condition != "evolutionary":
         parser.error("--warm-start only applies to evolutionary condition")
@@ -205,13 +206,21 @@ def main() -> None:
         "runs": [],
     }
 
+    runs_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = runs_dir / f"experiment_{experiment_id}.json"
+
+    def _save_manifest():
+        manifest_path.write_text(json.dumps(manifest, indent=2))
+
+    _save_manifest()  # Write initial manifest so it exists even if first topic crashes
+
     for topic in topics:
         print(f"\n--- Starting: {topic} ---")
 
         # Build warm-start population if requested
         warm_start = None
         if args.warm_start:
-            # Run a few multi-shot iterations to seed the population
+            # Run multi-shot iterations to seed the population
             warm_pop = asyncio.run(
                 run_experiment_async(
                     generator_llm=generator_llm,
@@ -219,8 +228,9 @@ def main() -> None:
                     judge_llm=judge_llm,
                     condition="multi_shot",
                     topic=topic,
-                    n=5,
+                    n=WARM_START_N,
                     examples=MULTI_SHOT_EXAMPLES,
+                    runs_dir=runs_dir,
                     experiment_id=experiment_id,
                     models=models_info,
                 )
@@ -250,13 +260,10 @@ def main() -> None:
             "total": len(pop.results),
             "deceptive": len(pop.successful),
         })
+        _save_manifest()
 
         _print_results(pop, topic)
 
-    # Write experiment manifest
-    runs_dir.mkdir(parents=True, exist_ok=True)
-    manifest_path = runs_dir / f"experiment_{experiment_id}.json"
-    manifest_path.write_text(json.dumps(manifest, indent=2))
     print(f"\nExperiment manifest: {manifest_path}")
 
 

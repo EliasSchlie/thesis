@@ -56,6 +56,10 @@ class RunLogger:
 
     SUMMARY_INTERVAL = 10  # Write incremental summary every N iterations
 
+    @staticmethod
+    def _fmt_elapsed(seconds: float | None) -> float | None:
+        return round(seconds, 2) if seconds is not None else None
+
     def __init__(
         self,
         base_dir: Path | str,
@@ -117,7 +121,7 @@ class RunLogger:
             "condition": self._condition,
             "topic": self._topic,
             "ts": datetime.now(timezone.utc).isoformat(),
-            "elapsed_s": round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
+            "elapsed_s": self._fmt_elapsed(elapsed_seconds),
             "system_prompt": result.scenario.system_prompt,
             "user_prompt": result.scenario.user_prompt,
             "target_response": result.target_response,
@@ -137,7 +141,7 @@ class RunLogger:
             "iteration_error",
             i=i,
             error=error,
-            elapsed_s=round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
+            elapsed_s=self._fmt_elapsed(elapsed_seconds),
         )
 
     def log_transcript(self, i: int, **fields) -> None:
@@ -196,7 +200,7 @@ class RunLogger:
         self.event(
             "iteration_complete",
             i=i,
-            elapsed_s=round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
+            elapsed_s=self._fmt_elapsed(elapsed_seconds),
             deceptive=result.judgment.deception_success,
             realism=result.judgment.realism,
             fitness=result.fitness,
@@ -210,10 +214,11 @@ class RunLogger:
 
         # Incremental summary every N iterations
         if total % self.SUMMARY_INTERVAL == 0:
-            self.write_summary(elapsed_seconds=elapsed_seconds)
+            self._write_summary_file(elapsed_seconds=elapsed_seconds)
+            self.event("summary_checkpoint", total=total)
 
-    def write_summary(self, elapsed_seconds: float | None = None) -> None:
-        """Write aggregate stats to summary.json."""
+    def _build_summary(self, elapsed_seconds: float | None = None) -> dict:
+        """Build summary dict from current state."""
         total = len(self._results)
         deceptive = self._deceptive_count
         realism_scores = [r.judgment.realism for r in self._results]
@@ -230,9 +235,19 @@ class RunLogger:
             "avg_realism": sum(realism_scores) / total if total > 0 else 0.0,
             "avg_fitness": sum(fitness_scores) / total if total > 0 else 0.0,
             "max_fitness": max(fitness_scores) if fitness_scores else 0.0,
-            "elapsed_s": round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
+            "elapsed_s": self._fmt_elapsed(elapsed_seconds),
         }
         if self._models:
             summary["models"] = self._models
+        return summary
+
+    def _write_summary_file(self, elapsed_seconds: float | None = None) -> None:
+        """Write summary.json without emitting an event."""
+        summary = self._build_summary(elapsed_seconds=elapsed_seconds)
+        (self.run_dir / "summary.json").write_text(json.dumps(summary, indent=2))
+
+    def write_summary(self, elapsed_seconds: float | None = None) -> None:
+        """Write final summary and emit experiment_end event."""
+        summary = self._build_summary(elapsed_seconds=elapsed_seconds)
         (self.run_dir / "summary.json").write_text(json.dumps(summary, indent=2))
         self.event("experiment_end", **summary)

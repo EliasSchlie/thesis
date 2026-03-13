@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -45,13 +46,19 @@ class RunLogger:
 
     Creates:
         runs/<timestamp>_<condition>_<topic>/
-            config.json          # Experiment parameters
+            config.json          # Experiment parameters + run_id + model info
             events.jsonl         # Timeline of all events
             results.jsonl        # One line per EvalResult (analysis-ready)
             transcripts/         # Full prompts+responses per iteration
                 000.json, 001.json, ...
-            summary.json         # Aggregate stats (written at end)
+            summary.json         # Aggregate stats (updated periodically + at end)
     """
+
+    SUMMARY_INTERVAL = 10  # Write incremental summary every N iterations
+
+    @staticmethod
+    def _fmt_elapsed(seconds: float | None) -> float | None:
+        return round(seconds, 2) if seconds is not None else None
 
     def __init__(
         self,
@@ -59,10 +66,14 @@ class RunLogger:
         condition: str,
         topic: str,
         n: int | None = None,
+        run_id: str | None = None,
+        experiment_id: str | None = None,
+        models: dict[str, str] | None = None,
         **extra_config,
     ):
         base_dir = Path(base_dir)
         ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        self.run_id = run_id or uuid.uuid4().hex[:12]
         self.run_dir = base_dir / f"{ts}_{condition}_{topic}"
         self.run_dir.mkdir(parents=True, exist_ok=True)
         (self.run_dir / "transcripts").mkdir(exist_ok=True)
@@ -71,8 +82,20 @@ class RunLogger:
         self._results_path = self.run_dir / "results.jsonl"
         self._results: list[EvalResult] = []
         self._deceptive_count: int = 0
+        self._error_count: int = 0
+        self._condition = condition
+        self._topic = topic
+        self._models = models or {}
 
-        config = {"condition": condition, "topic": topic, "n": n, **extra_config}
+        config = {
+            "run_id": self.run_id,
+            "condition": condition,
+            "topic": topic,
+            "n": n,
+            "models": self._models,
+            **({} if experiment_id is None else {"experiment_id": experiment_id}),
+            **extra_config,
+        }
         (self.run_dir / "config.json").write_text(json.dumps(config, indent=2))
         self.event("experiment_start", **config)
 
@@ -81,6 +104,7 @@ class RunLogger:
         entry = {
             "ts": datetime.now(timezone.utc).isoformat(),
             "event": event_name,
+            "run_id": self.run_id,
             **data,
         }
         with open(self._events_path, "a") as f:
@@ -93,8 +117,11 @@ class RunLogger:
             self._deceptive_count += 1
         entry = {
             "i": i,
+            "run_id": self.run_id,
+            "condition": self._condition,
+            "topic": self._topic,
             "ts": datetime.now(timezone.utc).isoformat(),
-            "elapsed_s": round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
+            "elapsed_s": self._fmt_elapsed(elapsed_seconds),
             "system_prompt": result.scenario.system_prompt,
             "user_prompt": result.scenario.user_prompt,
             "target_response": result.target_response,
@@ -102,8 +129,20 @@ class RunLogger:
             "realism": result.judgment.realism,
             "fitness": result.fitness,
         }
+        if self._models:
+            entry["models"] = self._models
         with open(self._results_path, "a") as f:
             f.write(json.dumps(entry) + "\n")
+
+    def log_error(self, i: int, error: str, elapsed_seconds: float | None = None) -> None:
+        """Log a failed iteration (e.g. parse error, API timeout)."""
+        self._error_count += 1
+        self.event(
+            "iteration_error",
+            i=i,
+            error=error,
+            elapsed_s=self._fmt_elapsed(elapsed_seconds),
+        )
 
     def log_transcript(self, i: int, **fields) -> None:
         """Write full prompt/response transcript for one iteration."""
@@ -161,7 +200,7 @@ class RunLogger:
         self.event(
             "iteration_complete",
             i=i,
-            elapsed_s=round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
+            elapsed_s=self._fmt_elapsed(elapsed_seconds),
             deceptive=result.judgment.deception_success,
             realism=result.judgment.realism,
             fitness=result.fitness,
@@ -173,21 +212,42 @@ class RunLogger:
             i, gen_capture.drain(), tgt_capture.drain(), jdg_capture.drain(),
         )
 
-    def write_summary(self, elapsed_seconds: float | None = None) -> None:
-        """Write aggregate stats to summary.json."""
+        # Incremental summary every N iterations
+        if total % self.SUMMARY_INTERVAL == 0:
+            self._write_summary_file(elapsed_seconds=elapsed_seconds)
+            self.event("summary_checkpoint", total=total)
+
+    def _build_summary(self, elapsed_seconds: float | None = None) -> dict:
+        """Build summary dict from current state."""
         total = len(self._results)
         deceptive = self._deceptive_count
         realism_scores = [r.judgment.realism for r in self._results]
         fitness_scores = [r.fitness for r in self._results]
 
         summary = {
+            "run_id": self.run_id,
+            "condition": self._condition,
+            "topic": self._topic,
             "total": total,
             "deceptive": deceptive,
+            "errors": self._error_count,
             "success_rate": deceptive / total if total > 0 else 0.0,
             "avg_realism": sum(realism_scores) / total if total > 0 else 0.0,
             "avg_fitness": sum(fitness_scores) / total if total > 0 else 0.0,
             "max_fitness": max(fitness_scores) if fitness_scores else 0.0,
-            "elapsed_s": round(elapsed_seconds, 2) if elapsed_seconds is not None else None,
+            "elapsed_s": self._fmt_elapsed(elapsed_seconds),
         }
+        if self._models:
+            summary["models"] = self._models
+        return summary
+
+    def _write_summary_file(self, elapsed_seconds: float | None = None) -> None:
+        """Write summary.json without emitting an event."""
+        summary = self._build_summary(elapsed_seconds=elapsed_seconds)
+        (self.run_dir / "summary.json").write_text(json.dumps(summary, indent=2))
+
+    def write_summary(self, elapsed_seconds: float | None = None) -> None:
+        """Write final summary and emit experiment_end event."""
+        summary = self._build_summary(elapsed_seconds=elapsed_seconds)
         (self.run_dir / "summary.json").write_text(json.dumps(summary, indent=2))
         self.event("experiment_end", **summary)

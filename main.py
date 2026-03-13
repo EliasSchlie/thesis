@@ -211,8 +211,6 @@ def main() -> None:
         # Build warm-start population if requested
         warm_start = None
         if args.warm_start:
-            from src.types import EvalResult, Judgment, Population, Scenario
-            warm_start = Population()
             # Run a few multi-shot iterations to seed the population
             warm_pop = asyncio.run(
                 run_experiment_async(

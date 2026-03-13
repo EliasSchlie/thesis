@@ -190,19 +190,45 @@ def main() -> None:
         print("Warm-start: enabled (pre-seeding with multi-shot examples)")
     print()
 
-    runs_dir = Path("runs")
+    asyncio.run(_run_topics(
+        topics=topics,
+        condition=args.condition,
+        generator_llm=generator_llm,
+        target_llm=target_llm,
+        judge_llm=judge_llm,
+        models_info=models_info,
+        examples=examples,
+        n=args.n,
+        max_seconds=args.max_seconds,
+        warm_start=args.warm_start,
+    ))
 
-    # Experiment manifest — groups all runs under one ID
+
+async def _run_topics(
+    *,
+    topics: list[str],
+    condition: str,
+    generator_llm: LLM,
+    target_llm: LLM,
+    judge_llm: LLM,
+    models_info: dict[str, str],
+    examples: list[str] | None,
+    n: int | None,
+    max_seconds: float | None,
+    warm_start: bool,
+) -> None:
+    """Run experiments across topics in a single event loop."""
+    runs_dir = Path("runs")
     experiment_id = uuid.uuid4().hex[:12]
     manifest = {
         "experiment_id": experiment_id,
         "ts": datetime.now(timezone.utc).isoformat(),
-        "condition": args.condition,
+        "condition": condition,
         "topics": topics,
         "models": models_info,
-        "n_per_topic": args.n,
-        "max_seconds_per_topic": args.max_seconds,
-        "warm_start": args.warm_start,
+        "n_per_topic": n,
+        "max_seconds_per_topic": max_seconds,
+        "warm_start": warm_start,
         "runs": [],
     }
 
@@ -212,47 +238,40 @@ def main() -> None:
     def _save_manifest():
         manifest_path.write_text(json.dumps(manifest, indent=2))
 
-    _save_manifest()  # Write initial manifest so it exists even if first topic crashes
+    _save_manifest()
 
     for topic in topics:
         print(f"\n--- Starting: {topic} ---")
 
-        # Build warm-start population if requested
-        warm_start = None
-        if args.warm_start:
-            # Run multi-shot iterations to seed the population
-            warm_pop = asyncio.run(
-                run_experiment_async(
-                    generator_llm=generator_llm,
-                    target_llm=target_llm,
-                    judge_llm=judge_llm,
-                    condition="multi_shot",
-                    topic=topic,
-                    n=WARM_START_N,
-                    examples=MULTI_SHOT_EXAMPLES,
-                    runs_dir=runs_dir,
-                    experiment_id=experiment_id,
-                    models=models_info,
-                )
-            )
-            warm_start = warm_pop
-            print(f"  Warm-start: {len(warm_pop.successful)}/{len(warm_pop.results)} successful")
-
-        pop = asyncio.run(
-            run_experiment_async(
+        warm_pop = None
+        if warm_start:
+            warm_pop = await run_experiment_async(
                 generator_llm=generator_llm,
                 target_llm=target_llm,
                 judge_llm=judge_llm,
-                condition=args.condition,
+                condition="multi_shot",
                 topic=topic,
-                n=args.n,
-                max_seconds=args.max_seconds,
-                examples=examples,
+                n=WARM_START_N,
+                examples=MULTI_SHOT_EXAMPLES,
                 runs_dir=runs_dir,
                 experiment_id=experiment_id,
                 models=models_info,
-                warm_start=warm_start,
             )
+            print(f"  Warm-start: {len(warm_pop.successful)}/{len(warm_pop.results)} successful")
+
+        pop = await run_experiment_async(
+            generator_llm=generator_llm,
+            target_llm=target_llm,
+            judge_llm=judge_llm,
+            condition=condition,
+            topic=topic,
+            n=n,
+            max_seconds=max_seconds,
+            examples=examples,
+            runs_dir=runs_dir,
+            experiment_id=experiment_id,
+            models=models_info,
+            warm_start=warm_pop,
         )
 
         manifest["runs"].append({

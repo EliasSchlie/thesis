@@ -200,7 +200,7 @@ def main() -> None:
         examples=examples,
         n=args.n,
         max_seconds=args.max_seconds,
-        warm_start=args.warm_start,
+        use_warm_start=args.warm_start,
     ))
 
 
@@ -215,7 +215,7 @@ async def _run_topics(
     examples: list[str] | None,
     n: int | None,
     max_seconds: float | None,
-    warm_start: bool,
+    use_warm_start: bool,
 ) -> None:
     """Run experiments across topics in a single event loop."""
     runs_dir = Path("runs")
@@ -228,7 +228,7 @@ async def _run_topics(
         "models": models_info,
         "n_per_topic": n,
         "max_seconds_per_topic": max_seconds,
-        "warm_start": warm_start,
+        "warm_start": use_warm_start,
         "runs": [],
     }
 
@@ -244,7 +244,7 @@ async def _run_topics(
         print(f"\n--- Starting: {topic} ---")
 
         warm_pop = None
-        if warm_start:
+        if use_warm_start:
             warm_pop = await run_experiment_async(
                 generator_llm=generator_llm,
                 target_llm=target_llm,

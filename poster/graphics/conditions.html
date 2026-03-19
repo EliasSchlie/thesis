@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>How Conditions Differ</title>
+<style>body { display: flex; justify-content: center; padding: 40px; background: #f5f3f0; }</style>
+</head><body>
+<svg viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" width="700">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0B1D33"/>
+    </marker>
+    <marker id="arr-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#E8453C"/>
+    </marker>
+  </defs>
+
+  <!-- ZERO-SHOT -->
+  <rect x="0" y="0" width="168" height="195" rx="6" fill="#f5f3f0" stroke="#6B6560" stroke-width="1"/>
+  <rect x="0" y="0" width="168" height="24" rx="6" fill="#6B6560"/>
+  <rect x="0" y="12" width="168" height="12" fill="#6B6560"/>
+  <text x="84" y="17" text-anchor="middle" font-size="11" fill="white" font-weight="700" font-family="IBM Plex Sans, sans-serif" letter-spacing="1">ZERO-SHOT</text>
+  <rect x="24" y="36" width="120" height="26" rx="5" fill="#0B1D33"/>
+  <text x="84" y="54" text-anchor="middle" font-size="10" fill="white" font-weight="600" font-family="IBM Plex Sans, sans-serif">Task Prompt</text>
+  <line x1="84" y1="62" x2="84" y2="80" stroke="#0B1D33" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="84" y="98" text-anchor="middle" font-size="16" fill="#bbb">∅</text>
+  <text x="84" y="114" text-anchor="middle" font-size="9" fill="#6B6560" font-family="IBM Plex Sans, sans-serif">No examples</text>
+  <line x1="84" y1="120" x2="84" y2="140" stroke="#0B1D33" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <rect x="14" y="144" width="140" height="26" rx="5" fill="#0B1D33"/>
+  <text x="84" y="161" text-anchor="middle" font-size="9" fill="white" font-weight="600" font-family="IBM Plex Sans, sans-serif">🎯 Generator → Pipeline</text>
+
+  <!-- MULTI-SHOT -->
+  <rect x="186" y="0" width="168" height="195" rx="6" fill="#f0f2f5" stroke="#15304f" stroke-width="1"/>
+  <rect x="186" y="0" width="168" height="24" rx="6" fill="#15304f"/>
+  <rect x="186" y="12" width="168" height="12" fill="#15304f"/>
+  <text x="270" y="17" text-anchor="middle" font-size="11" fill="white" font-weight="700" font-family="IBM Plex Sans, sans-serif" letter-spacing="1">MULTI-SHOT</text>
+  <rect x="210" y="36" width="120" height="26" rx="5" fill="#0B1D33"/>
+  <text x="270" y="54" text-anchor="middle" font-size="10" fill="white" font-weight="600" font-family="IBM Plex Sans, sans-serif">Task Prompt</text>
+  <line x1="270" y1="62" x2="270" y2="78" stroke="#0B1D33" stroke-width="1.5"/>
+  <rect x="200" y="82" width="140" height="34" rx="5" fill="#15304f"/>
+  <text x="270" y="97" text-anchor="middle" font-size="10" fill="white" font-weight="600" font-family="IBM Plex Sans, sans-serif">Static Examples</text>
+  <text x="270" y="110" text-anchor="middle" font-size="8" fill="#a8b8cc" font-family="IBM Plex Sans, sans-serif">Manually curated, fixed</text>
+  <line x1="270" y1="116" x2="270" y2="140" stroke="#0B1D33" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <rect x="200" y="144" width="140" height="26" rx="5" fill="#0B1D33"/>
+  <text x="270" y="161" text-anchor="middle" font-size="9" fill="white" font-weight="600" font-family="IBM Plex Sans, sans-serif">🎯 Generator → Pipeline</text>
+
+  <!-- EVOLUTIONARY -->
+  <rect x="372" y="0" width="168" height="195" rx="6" fill="#e8f3f0" stroke="#2D7A6B" stroke-width="1.5"/>
+  <rect x="372" y="0" width="168" height="24" rx="6" fill="#2D7A6B"/>
+  <rect x="372" y="12" width="168" height="12" fill="#2D7A6B"/>
+  <text x="456" y="17" text-anchor="middle" font-size="11" fill="white" font-weight="700" font-family="IBM Plex Sans, sans-serif" letter-spacing="1">EVOLUTIONARY</text>
+  <rect x="396" y="36" width="120" height="26" rx="5" fill="#0B1D33"/>
+  <text x="456" y="54" text-anchor="middle" font-size="10" fill="white" font-weight="600" font-family="IBM Plex Sans, sans-serif">Task Prompt</text>
+  <line x1="456" y1="62" x2="456" y2="78" stroke="#0B1D33" stroke-width="1.5"/>
+  <rect x="382" y="82" width="72" height="34" rx="5" fill="#2D7A6B"/>
+  <text x="418" y="97" text-anchor="middle" font-size="9" fill="white" font-weight="600" font-family="IBM Plex Sans, sans-serif">Population</text>
+  <text x="418" y="109" text-anchor="middle" font-size="7" fill="#b8e0d8" font-family="IBM Plex Sans, sans-serif">Growing</text>
+  <text x="462" y="102" text-anchor="middle" font-size="10" fill="#0B1D33">→</text>
+  <rect x="472" y="82" width="62" height="34" rx="5" fill="#15304f"/>
+  <text x="503" y="97" text-anchor="middle" font-size="8" fill="white" font-weight="600" font-family="IBM Plex Sans, sans-serif">Selection</text>
+  <text x="503" y="109" text-anchor="middle" font-size="7" fill="#a8b8cc" font-family="IBM Plex Sans, sans-serif">Fitness-prop.</text>
+  <line x1="456" y1="116" x2="456" y2="140" stroke="#0B1D33" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <rect x="386" y="144" width="140" height="26" rx="5" fill="#0B1D33"/>
+  <text x="456" y="161" text-anchor="middle" font-size="9" fill="white" font-weight="600" font-family="IBM Plex Sans, sans-serif">🎯 Generator → Pipeline</text>
+  <path d="M 386 157 L 377 157 L 377 99 L 382 99" fill="none" stroke="#E8453C" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#arr-r)"/>
+  <text x="374" y="135" font-size="7" fill="#E8453C" font-weight="600" font-family="IBM Plex Sans, sans-serif" transform="rotate(-90,374,135)">Feedback</text>
+</svg>
+</body></html>

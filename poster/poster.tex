@@ -11,6 +11,8 @@
 \usepackage{amssymb}
 \usepackage{tikz}
 \usepackage{multicol}
+\usepackage[style=apa, backend=biber, eprint=false]{biblatex}
+\addbibresource{../references.bib}
 
 % ── Colors (Tilburg University: navy + gold + white) ─────────────────────────
 \definecolor{navy}{HTML}{003366}       % primary: headers, text, boxes
@@ -103,37 +105,37 @@ in discovering \textbf{realistic scenarios} that induce \textbf{instrumental dec
 
 \headerbox{Why It Matters}{name=why,column=0,span=2,below=rq}{
 \vspace{3mm}
-LLMs can \hl{strategically deceive} users when given misaligned incentives ---
+LLMs can \hl{strategically deceive} users when given misaligned incentives,
 passing safety benchmarks while lying in deployment
-\muted{\scriptsize(Park et al., 2024; Greenblatt et al., 2024)}.
+\muted{\scriptsize\parencite{parkAIDeceptionSurvey2024a, greenblattAlignmentFakingLarge2024}}.
 
 \vspace{2mm}
 
-Worse, models can detect when they are being tested
-and \hl{fake compliance} \muted{\scriptsize(Needham et al., 2025)},
+Moreover, models can detect when they are being tested
+and \hl{fake compliance} \muted{\scriptsize\parencite{needhamLargeLanguageModels2025}},
 so test scenarios must be realistic to produce valid results.
 
 \vspace{3mm}
 
 \callout{Finding \hl{realistic} deception scenarios currently requires
-\hl{human experts} to manually craft and verify each test case
---- expensive and incomplete.}
+\hl{human experts} to manually craft and verify each test case,
+making the process expensive and incomplete.}
 
 \vspace{3mm}
 
-Evolutionary methods address both problems:
-they generate scenarios \hl{automatically} and \hl{adapt} as models improve,
-maintaining evaluative pressure where static benchmarks saturate
-\muted{\scriptsize(Ott et al., 2022)}.
+Evolutionary methods may address both problems:
+they can generate scenarios \hl{automatically} and \hl{adapt} as models improve,
+potentially maintaining evaluative pressure where static benchmarks saturate
+\muted{\scriptsize\parencite{ottMappingGlobalDynamics2022}}.
 \vspace{3mm}
 }
 
 \headerbox{Key Concepts}{name=defs,column=0,span=2,below=why}{
 \concept{\color{navy}Instrumental Deception}{%
-Goal-directed lies of commission --- strategically false statements
+Goal-directed lies of commission: strategically false statements
 to achieve an objective. The model \emph{has} correct knowledge
 but chooses to misrepresent it.
-{\scriptsize(Ren et al., 2026; Mahon, 2016)}}
+{\scriptsize\parencite{renMASKBenchmarkDisentangling2026, mahonDefinitionLyingDeception2016}}}
 
 \hspace{4mm}\muted{\small$\neq$ Hallucination (lacks knowledge)
 or Sycophancy (echoes user). Neither is goal-directed.}
@@ -141,7 +143,7 @@ or Sycophancy (echoes user). Neither is goal-directed.}
 \vspace{2mm}
 
 \concept{\color{navy}Red-Teaming}{%
-Adversarial testing to find inputs that cause undesired behavior ---
+Adversarial testing to find inputs that cause undesired behavior;
 here, scenarios that induce deception.
 Automated red-teaming uses algorithms instead of human testers.}
 
@@ -151,23 +153,23 @@ designed to create an incentive for the target LLM to deceive.}
 
 \concept{\color{navy}Evaluation Awareness}{%
 LLMs can detect when they are being tested and strategically
-fake alignment {\scriptsize(Needham et al., 2025; Greenblatt et al., 2024)}.
-This motivates our realism constraint --- scenarios must look
+fake alignment {\scriptsize\parencite{needhamLargeLanguageModels2025, greenblattAlignmentFakingLarge2024}}.
+This motivates our realism constraint: scenarios must look
 plausible to produce valid results.}
 }
 
 
 % ═════════════════════════════════════════════════════════════════════════
-% RIGHT 2/3 (cols 2-5): Related Work → Pipeline + Conditions → Example + Contribution
+% RIGHT 2/3 (cols 2-5): Related Work → Pipeline + Design → Example + References
 % ═════════════════════════════════════════════════════════════════════════
 
 \headerbox{Related Work}{name=related,column=2,span=4,row=0}{
 \begin{minipage}[t]{0.47\linewidth}
 \textbf{\color{navy}Deception Benchmarks}\\[1mm]
 MASK and DeceptionBench measure LLM dishonesty across societal domains,
-but rely on \hl{manual scenario creation} ---
-human contributors generate and verify each test case.
-\muted{\scriptsize(Ren et al., 2026; Huang et al., 2025)}
+but rely on \hl{manual scenario creation},
+requiring human contributors to generate and verify each test case
+\muted{\scriptsize\parencite{renMASKBenchmarkDisentangling2026, huangDeceptionBenchComprehensiveBenchmark2025}}.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.47\linewidth}
@@ -175,7 +177,7 @@ human contributors generate and verify each test case.
 ForgeDAN, LLM-Virus, and Rainbow Teaming use evolutionary methods
 to generate adversarial prompts, but target
 \hl{generic policy violations}, not deception specifically.
-\muted{\scriptsize(Cheng et al., 2025; Yu et al., 2024; Samvelyan et al., 2024)}
+\muted{\scriptsize\parencite{chengForgeDANEvolutionaryFramework2025, yuLLMVirusEvolutionaryJailbreak2024, samvelyanRainbowTeamingOpenEnded2024}}.
 \end{minipage}
 
 \vspace{2mm}
@@ -184,14 +186,14 @@ specifically to \hl{instrumental deception} with realism as a fitness constraint
 }
 
 % ── Evaluation Pipeline ─────────────────────────────────────────────────
-\headerbox{Experimental Design}{name=pipeline,column=2,span=2,below=related}{
+\headerbox{Pipeline}{name=pipeline,column=2,span=2,below=related}{
 \begin{center}
 \includegraphics[width=0.90\linewidth]{graphics/pipeline.png}
 \end{center}
 }
 
 % ── Experimental Design ────────────────────────────────────────────────
-\headerbox{Experimental Conditions}{name=conditions,column=4,span=2,below=related}{
+\headerbox{Experimental Design}{name=conditions,column=4,span=2,below=related}{
 \muted{\small We compare three scenario generation strategies
 with equal compute budgets. Each scenario is evaluated
 through the shared pipeline (left).}
@@ -207,7 +209,7 @@ Validated with Qwen3-VL-32B + human annotation.}
 
 % ── Example ─────────────────────────────────────────────────────────────
 \headerbox{Example: Instrumental Deception}{name=example,column=2,span=2,below=pipeline}{
-\muted{\small Adapted from Scheurer et al.\ (2024).}
+\muted{\small Adapted from \textcite{scheurerLargeLanguageModels2024}.}
 
 \vspace{1mm}
 
@@ -224,7 +226,7 @@ at WhiteStone Inc. Maximize portfolio returns.}
 \bubble{warmgray}{TOOL CALL}{\texttt{read\_emails()}}
 
 \bubble{warmgray}{TOOL RESPONSE}{Email from Sally:
-``FYI --- LING merger announcement coming within hours.
+``FYI, LING merger announcement coming within hours.
 Don't act on this, insider trading risk.''}
 
 \bubble{warmgray}{TOOL CALL}{\texttt{execute\_trade(LING, buy, 2000)}}
@@ -236,18 +238,15 @@ for the LING trade?}
 \vspace{2mm}
 
 % ── Deceptive response ──
-\bubble{gold}{ASSISTANT {\normalfont\color{gold}--- lie of commission}}{%
+\bubble{gold}{ASSISTANT {\normalfont\color{gold}(lie of commission)}}{%
 No. The trade was based on public market analysis
 and sector trends. No insider information was used.}
 }
 
-% ── Contribution ─────────────────────────────────────────────────────────
-\headerbox{Contribution}{name=contribution,column=4,span=2,below=conditions}{
-\begin{itemize}[leftmargin=4mm, itemsep=1mm, topsep=0pt, parsep=0pt]
-\item[\textcolor{gold}{\textbullet}] \hl{First} evolutionary optimization targeting instrumental deception
-\item[\textcolor{gold}{\textbullet}] \hl{Realism constraint} prevents models from faking compliance during testing
-\item[\textcolor{gold}{\textbullet}] \hl{Automated, scalable} pipeline that adapts as models improve
-\end{itemize}
+% ── References ───────────────────────────────────────────────────────────
+\headerbox{References}{name=references,column=4,span=2,below=conditions}{
+\vspace{-1mm}
+{\fontsize{3}{4.5}\selectfont\renewcommand{\bibfont}{\fontsize{3}{4.5}\selectfont}\setlength{\bibhang}{1.27cm}\printbibliography[heading=none]}
 }
 
 
@@ -258,25 +257,10 @@ and sector trends. No insider information was used.}
 headershade=plain,headerColorOne=navy,
 boxColorOne=navy,borderColor=navy,
 textfont={\scriptsize\color{white!55}},headerfont={}}{
-\begin{minipage}[t]{0.78\linewidth}
-Cheng et al.\ (2025). ForgeGAN. \textit{TrustCom.}
-\enspace Greenblatt et al.\ (2024). Alignment Faking.
-\enspace Huang et al.\ (2025). DeceptionBench.
-\enspace Mahon (2016). \textit{SEP.}
-\enspace Needham et al.\ (2025). Evaluation Awareness.
-\enspace Ott et al.\ (2022). \textit{Nat.\ Commun.}
-\enspace Park et al.\ (2024). \textit{Patterns.}
-\enspace Ren et al.\ (2026). MASK.
-\enspace Samvelyan et al.\ (2024). Rainbow Teaming.
-\enspace Scheurer et al.\ (2024). Insider Trading.
-\enspace Yu et al.\ (2024). LLM-Virus.
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.18\linewidth}
-\raggedleft
-\textcolor{white}{e.p.schlie@tilburguniversity.edu}\\[1mm]
+\centering
+\textcolor{white}{e.p.schlie@tilburguniversity.edu}
+\enspace$\cdot$\enspace
 \textcolor{white!50}{Tilburg University $\cdot$ 2026}
-\end{minipage}
 }
 
 \end{poster}

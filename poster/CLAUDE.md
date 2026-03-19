@@ -8,19 +8,25 @@ LaTeX poster using `baposter` (A0 portrait). `baposter.cls` is checked in locall
 cd poster && pdflatex poster.tex
 ```
 
-## Embedding Excalidraw Diagrams
+## Excalidraw Diagrams
 
-1. Create/edit in Obsidian's Excalidraw plugin (`~/vault/Excalidraw/`)
-2. Export to `poster/graphics/` (SVG preferred for print sharpness, PNG also works)
-3. Embed: `\includegraphics[width=0.90\linewidth]{graphics/<name>.png}`
+Diagrams are `.excalidraw` files (JSON format) in `~/vault/Excalidraw/`. To create or edit them, use the **obsidian skill** — it has an Excalidraw sub-skill (`excalidraw.md`) with full instructions for generating the JSON, color palette, element templates, and a render-view-fix loop.
 
-**CLI render** (alternative to manual export):
-```bash
-cd ~/.claude/skills/obsidian/excalidraw-references
-uv run python render_excalidraw.py ~/vault/Excalidraw/<file>.excalidraw --output poster/graphics/<name>.png
-```
+**Workflow:**
 
-First-time renderer setup:
+1. Invoke the obsidian skill, read `excalidraw.md`
+2. Generate/edit `.excalidraw` JSON in `~/vault/Excalidraw/`
+3. Render to PNG and copy to `poster/graphics/`:
+   ```bash
+   cd ~/.claude/skills/obsidian/excalidraw-references
+   uv run python render_excalidraw.py ~/vault/Excalidraw/<file>.excalidraw \
+     --output <absolute-path-to>/poster/graphics/<name>.png
+   ```
+4. Embed in `poster.tex`: `\includegraphics[width=0.90\linewidth]{graphics/<name>.png}`
+
+The user can also edit `.excalidraw` files visually in Obsidian's Excalidraw plugin and export manually.
+
+**First-time renderer setup:**
 ```bash
 cd ~/.claude/skills/obsidian/excalidraw-references && uv sync && uv run playwright install chromium
 ```

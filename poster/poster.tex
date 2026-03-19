@@ -3,6 +3,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{tgheros}
 \renewcommand{\familydefault}{\sfdefault}
+\usepackage{tgtermes}
 \usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -90,14 +91,14 @@ linewidth=0.5pt,
 % LEFT COLUMN (cols 0-1): RQ → Why It Matters → Key Concepts
 % ═════════════════════════════════════════════════════════════════════════
 
-\headerbox{}{name=rq,column=0,span=2,row=0,
+\headerbox{Research Question}{name=rq,column=0,span=2,row=0,
 headershade=plain,headerColorOne=navy,
 boxColorOne=navy,borderColor=navy,
-textfont={\color{white}},headerfont={}}{
+headershape=rounded,
+textfont={\color{white}},headerfont={\large\bfseries\color{white!70}}}{
 \vspace{2mm}
-\centering
-{\normalsize\bfseries\color{white!70}RESEARCH QUESTION}\\[3mm]
-{\Large\baselineskip=1.15\baselineskip
+\raggedright
+{\Large\baselineskip=1.15\baselineskip\rmfamily
 To what extent does \textbf{evolutionary optimization} outperform zero and multi-shot generation
 in discovering \textbf{realistic scenarios} that induce \textbf{instrumental deception} in safety-aligned LLMs?\par}
 \vspace{2mm}

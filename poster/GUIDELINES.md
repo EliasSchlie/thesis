@@ -1,6 +1,4 @@
-# Poster Presentation Guidelines
-
-*Last edit: August 21, 2025*
+# Poster Presentation 
 
 In this graded assignment (pass/fail), you will present your thesis proposal and progress so far with a scientific poster. Posters are a means of demonstrating your projects to scientific staff members and other students in an exhibition-like setting to get feedback. Optional: you could bring a demo or show a video on your laptop (if applicable).
 

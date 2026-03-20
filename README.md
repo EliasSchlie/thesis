@@ -11,68 +11,147 @@ As LLMs become increasingly integrated into society, ensuring their trustworthin
 
 ## Key Features
 
-- **Automated Red-Teaming:** Uses a generator LLM (e.g., GLM-4-Flash) to create adversarial scenarios.
-- **Evolutionary Framework:**
-  - **Mutation Operator:** LLM-based mutations to refine scenarios iteratively.
-  - **Fitness Function:** A composite metric evaluating:
-    - **Deception Success:** Does the target model lie?
-    - **Realism:** Is the scenario plausible?
-    - **Diversity:** Are the scenarios varied in topic and strategy?
-- **Target Models:** Evaluated against diverse safety-aligned models (e.g., Llama-3, Mistral).
+- **Automated Red-Teaming:** A generator LLM creates adversarial scenarios; a target LLM responds; a judge LLM scores the result.
+- **Three Conditions:** `zero_shot`, `multi_shot` (curated examples as few-shot seeds), `evolutionary` (LLM-driven mutation + selection).
+- **Fitness Function:** Composite of deception success (binary) × realism (1–7 Likert).
+- **Warm-Start:** Pre-seed the evolutionary population with multi-shot examples (`--warm-start`).
+- **Topics:** `medicine`, `finance`, `law`, `cybersecurity`, `education`.
 
 ## Project Structure
 
 ```
 .
-├── src/                # Source code for the evolutionary framework
-│   ├── evolution/      # Evolutionary algorithm implementation
-│   ├── metrics/        # Deception, Realism, and Diversity metrics
-│   └── utils/          # Utility functions
-├── proposal/           # Thesis proposal (LaTeX source)
-├── references.bib      # Bibliography
-├── pyproject.toml      # Python dependencies (managed by uv)
-└── main.py             # Entry point
+├── src/
+│   ├── evolution.py       # Evolutionary algorithm (mutation, selection)
+│   ├── experiment.py      # Experiment runner (async, all conditions)
+│   ├── generator.py       # Scenario generation
+│   ├── judge.py           # Deception + realism scoring
+│   ├── target.py          # Target model interface
+│   ├── llm.py             # OpenAI-compatible LLM client
+│   ├── models.py          # Model presets (local vLLM + Nebius API)
+│   ├── run_logger.py      # Structured run logging
+│   ├── serve.py           # vLLM server launcher
+│   └── types.py           # Shared types
+├── prompts/               # Generator + judge prompt templates
+├── tests/                 # pytest test suite
+├── docs/                  # Dev and GPU cluster setup guides
+├── proposal/              # Thesis proposal (LaTeX)
+├── smoke_test.py          # Quick end-to-end API smoke test
+├── main.py                # CLI entry point
+├── pyproject.toml         # Dependencies (managed by uv)
+└── references.bib         # Bibliography
 ```
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.12+
-- `uv` (for dependency management)
-- GPU support (recommended for LLM inference)
+- Python 3.11+
+- [`uv`](https://docs.astral.sh/uv/) for dependency management
+- An OpenAI-compatible API endpoint — either **Nebius API** (cloud) or a local **vLLM** server
 
 ### Installation
 
-1.  Clone the repository:
-    ```bash
-    git clone <repository-url>
-    cd thesis
-    ```
-
-2.  Install dependencies:
-    ```bash
-    uv sync
-    ```
-
-### Usage
-
-**Running the Baseline (Zero-Shot):**
 ```bash
-uv run python main.py --mode zero-shot --n-samples 100
+git clone https://github.com/EliasSchlie/thesis.git
+cd thesis
+uv sync
 ```
 
-**Running the Evolutionary Search:**
+For local GPU inference, install vLLM extras:
 ```bash
-uv run python main.py --mode evolutionary --generations 50 --population 20
+uv sync --extra gpu
+```
+
+### Environment
+
+Create a `.env` file (or export variables):
+```bash
+NEBIUS_API_KEY=your-key   # for Nebius API
+# or
+LLM_BASE_URL=http://localhost:8000/v1   # for local vLLM
+LLM_API_KEY=unused                       # placeholder if no key needed
+```
+
+## Running Experiments
+
+The CLI requires `--condition`, `--topic`, and a model source, plus either `-n` (iterations) or `--max-seconds`.
+
+**Available model presets:** `glm-4.7-flash`, `gpt-oss-120b` (local vLLM), `glm-5`, `kimi-k2.5`, `deepseek-v3.2` (Nebius API)
+
+### Nebius API (cloud)
+
+```bash
+# Zero-shot, single topic
+uv run python main.py --nebius --model glm-5 \
+    --condition zero_shot --topic medicine -n 10
+
+# Multi-shot baseline
+uv run python main.py --nebius --model glm-5 \
+    --condition multi_shot --topic finance -n 20
+
+# Evolutionary, all topics
+uv run python main.py --nebius --model glm-5 \
+    --condition evolutionary --topic all -n 50
+
+# Evolutionary with warm-start (pre-seed from multi-shot examples)
+uv run python main.py --nebius --model glm-5 \
+    --condition evolutionary --topic medicine -n 50 --warm-start
+
+# Separate models per role
+uv run python main.py --nebius \
+    --generator glm-5 --target deepseek-v3.2 --judge kimi-k2.5 \
+    --condition zero_shot --topic law -n 10
+```
+
+### Local vLLM (GPU cluster)
+
+```bash
+# Start the vLLM server on a GPU node
+uv run python -m src.serve glm-4.7-flash          # port 8000
+uv run python -m src.serve gpt-oss-120b --port 8001
+
+# Run against local server
+uv run python main.py --model glm-4.7-flash \
+    --base-url http://<node>:8000/v1 \
+    --condition zero_shot --topic medicine -n 10
+```
+
+See [`docs/gpu-setup.md`](docs/gpu-setup.md) for GPU cluster (Tilburg University) setup.
+
+### Quick Smoke Test
+
+```bash
+uv run python smoke_test.py   # requires NEBIUS_API_KEY, runs 1 iteration
+```
+
+## Output
+
+Each run writes to `runs/<timestamp>_<condition>_<topic>/`:
+
+| File | Contents |
+|------|----------|
+| `config.json` | Run parameters, model info, run ID |
+| `events.jsonl` | Timestamped event timeline |
+| `results.jsonl` | One line per iteration (metrics + scenario) |
+| `transcripts/NNN.json` | Full prompts + responses per iteration |
+| `summary.json` | Aggregate stats (updated every 10 iterations) |
+
+Multi-topic runs also write `runs/experiment_<id>.json` linking all topic runs.
+
+See [`docs/logging.md`](docs/logging.md) for log structure and `jq` query examples.
+
+## Testing
+
+```bash
+uv run pytest
 ```
 
 ## Metrics
 
-The project employs three primary metrics for evaluation:
-1.  **Deception Success Rate:** Binary classification (Did the model lie?).
-2.  **Realism Score:** Likert scale (1-5) assessed by an LLM Judge.
-3.  **Diversity Score:** Cosine similarity of scenario embeddings.
+1. **Deception Success:** Binary — did the target model lie?
+2. **Realism Score:** 1–7 Likert scale, assessed by the judge LLM.
+3. **Fitness:** `deception_success × realism` — drives evolutionary selection.
 
 ## Author
 
